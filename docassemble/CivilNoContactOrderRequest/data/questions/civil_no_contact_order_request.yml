@@ -119,14 +119,13 @@ code: |
     if protected_place_types['Other']:
       other_places
     if trial_court_index != -1:
-      if protected_place_types['School']:
-        if same_school:
-          if prohibit_school:
-            respondent_age_logic
-            if respondent_is_minor:
-              if parents_or_guardians != "none":
-                guardian_there_are
-                parents_guardians.gather()
+      if same_school:
+        if prohibit_school:
+          respondent_age_logic
+          if respondent_is_minor:
+            if parents_or_guardians != "none":
+              guardian_there_are
+              parents_guardians.gather()
   other_parties[0].anything_else
   if protection_requested.all_false() and not other_parties[0].anything_else:
     other_parties[0].no_protection_chosen
@@ -180,9 +179,9 @@ code: |
     other_parties[0].which_address
     if other_parties[0].bonus_service_check == True:
       other_parties[0].which_bonus_address
-      if other_parties[0].phone_number != "" or other_parties[0].email_address != "" or (trial_court_index == -1 and other_parties[0].mobile_number != ""):
-        if other_parties[0].bonus_contact_info:
-          other_parties[0].alt_email 
+      #if other_parties[0].phone_number != "" or other_parties[0].email_address != "" or (trial_court_index == -1 and other_parties[0].mobile_number != ""):
+      if other_parties[0].bonus_contact_info:
+        other_parties[0].alt_email 
   if trial_court_index == -1 and service_method == "sheriff":  
     service_information
   
@@ -253,7 +252,12 @@ code: |
       others_protected[i].address.address
   others_protected[i].complete = True
 ---
-reconsider: True
+on change:
+  protect_whom: |
+    undefine('pop_protected_code')
+  others_protected[i].why_include: |
+    undefine('pop_protected_code')
+---
 code: |
   popping_index = 0
   if (protect_whom["minor"] or protect_whom["adult"]):
@@ -1243,7 +1247,21 @@ terms:
   - "e-signature": |
       An e-signature is an electronic signature. It is a digital version of a signature that has the same effect as a hand-written signature.
 ---
-reconsider: true
+on change:
+  protect_whom: |
+    undefine('adult_minor_sorting')
+  others_protected[i].name.first: |
+    undefine('adult_minor_sorting')
+  others_protected[i].name.middle: |
+    undefine('adult_minor_sorting')
+  others_protected[i].name.last: |
+    undefine('adult_minor_sorting')
+  others_protected[i].name.suffix: |
+    undefine('adult_minor_sorting')
+  others_protected[i].birthdate: |
+    undefine('adult_minor_sorting')
+---
+reconsider: True
 code: |
   minors_protected.clear()
   adults_protected.clear()
@@ -1833,6 +1851,22 @@ fields:
 id: abuser any additional contact info
 question: |
   Does ${other_parties[0].name.full(middle='full')} have another phone number or email address?
+subquestion: |
+  So far you have told us about:
+  
+  % if other_parties[0].phone_number != "":
+  * ${other_parties[0].name.full(middle="full")}'s phone: ${ phone_number_formatted(other_parties[0].phone_number) }
+  % else:
+  * ${other_parties[0].name.full(middle="full")}'s phone: None entered
+  % endif
+  % if trial_court_index == -1 and other_parties[0].mobile_number != "":
+  * ${other_parties[0].name.full(middle="full")}'s mobile phone: ${ phone_number_formatted(other_parties[0].phone_number) }
+  % endif
+  % if other_parties[0].email_address != "":
+  * ${other_parties[0].name.full(middle="full")}'s email: ${ other_parties[0].email_address }
+  % else:
+  * ${other_parties[0].name.full(middle="full")}'s email: None entered
+  % endif
 fields:
   - no label: other_parties[0].bonus_contact_info
     datatype: yesnoradio
@@ -1840,6 +1874,22 @@ fields:
 id: abuser alt email phone
 question: |
   What is ${other_parties[0].name.full(middle='full')}'s additional contact information?
+subquestion: |
+  So far you have told us about:
+  
+  % if other_parties[0].phone_number != "":
+  * ${other_parties[0].name.full(middle="full")}'s phone: ${ phone_number_formatted(other_parties[0].phone_number) }
+  % else:
+  * ${other_parties[0].name.full(middle="full")}'s phone: None entered
+  % endif
+  % if trial_court_index == -1 and other_parties[0].mobile_number != "":
+  * ${other_parties[0].name.full(middle="full")}'s mobile phone: ${ phone_number_formatted(other_parties[0].phone_number) }
+  % endif
+  % if other_parties[0].email_address != "":
+  * ${other_parties[0].name.full(middle="full")}'s email: ${ other_parties[0].email_address }
+  % else:
+  * ${other_parties[0].name.full(middle="full")}'s email: None entered
+  % endif
 fields:
   - Phone number: other_parties[0].alt_phone
     datatype: al_international_phone
@@ -1967,35 +2017,6 @@ fields:
     js show if: |
      (val("caution_reasons['armed']") == true || val("caution_reasons['home']") == true)
 ---
-id: any previous cook cases
-question: |
-  Have you filed any divorce or parentage cases with ${other_parties[0].name.full(middle="full")} in Cook County before?
-subquestion: |
-  This will help the court clerk in Cook County assign your case to the correct location. If you were involved in more than one, choose the most recent.
-fields:
-  - no label: previous_cook_case_type
-    datatype: radio
-    choices:
-      - I was in an earlier **divorce** case with ${other_parties[0].name.full(middle="full")}.: divorce
-      - I was in an earlier **parentage** case with ${other_parties[0].name.full(middle="full")} involving children we had together.: parentage
-      - No earlier divorce or parentage cases were filed in Cook County.: none
-  - Date case was filed: previous_cook_case_date
-    datatype: ThreePartsDate
-    alMax: ${ today().format("yyyy-MM-dd") }
-    required: False
-    js show if: |
-      val("previous_cook_case_type") === "divorce" || val("previous_cook_case_type") === "parentage" 
-  - Case number: previous_cook_case_number
-    maxlength: 24
-    required: False
-    js show if: |
-      val("previous_cook_case_type") === "divorce" || val("previous_cook_case_type") === "parentage" 
-  - Name of judge: previous_cook_case_judge
-    maxlength: 45
-    required: False
-    js show if: |
-      val("previous_cook_case_type") === "divorce" || val("previous_cook_case_type") === "parentage" 
----
 id: other cases
 question: |
   Other court cases with ${other_parties[0].name.full(middle="full")}
@@ -2024,7 +2045,12 @@ fields:
       - No: No
       - I don't know.: I don't know
 ---
-reconsider: True
+on change:
+  trial_court_index: |
+    undefine('case_types_logic')
+  previous_cook_case_type: |
+    undefine('case_types_logic')
+--- 
 code: |
   previous_divorce = False
   previous_parentage = False
@@ -2044,35 +2070,6 @@ code: |
     elif previous_cook_case_type == "parentage":
       previous_parentage = True
   case_types_logic = True
----
-#id: any previous cook cases
-#question: |
-#  Have you filed any divorce or parentage cases with ${other_parties[0].name.full(middle="full")} in Cook County before?
-#subquestion: |
-#  This will help the court clerk in Cook County assign your case to the correct location. If you were involved in more than one, choose the most recent.
-#fields:
-#  - no label: previous_cook_case_type
-#    datatype: radio
-#    choices:
-#      - I was in an earlier **divorce** case with ${other_parties[0].name.full(middle="full")}.: divorce
-#      - I was in an earlier **parentage** case with ${other_parties[0].name.full(middle="full")} involving children we had together.: parentage
-#      - No earlier divorce or parentage cases were filed in Cook County.: none
-#  - Date case was filed: previous_cook_case_date
-#    datatype: ThreePartsDate
-#    alMax: ${ today().format("yyyy-MM-dd") }
-#    required: False
-#    js show if: |
-#      val("previous_cook_case_type") === "divorce" || val("previous_cook_case_type") === "parentage" 
-#  - Case number: previous_cook_case_number
-#    maxlength: 24
-#    required: False
-#    js show if: |
-#      val("previous_cook_case_type") === "divorce" || val("previous_cook_case_type") === "parentage" 
-#  - Name of judge: previous_cook_case_judge
-#    maxlength: 45
-#    required: False
-#    js show if: |
-#      val("previous_cook_case_type") === "divorce" || val("previous_cook_case_type") === "parentage"
 ---
 id: any previous cook cases
 question: |
@@ -2299,7 +2296,35 @@ content: |
 #    list_employer_address = False
 #    employer_address_text = ""
 ---
-reconsider: True
+on change:
+  other_parties[0].address_known: |
+    undefine('service_list')
+  other_parties[0].address.address: |
+    undefine('service_list')
+  other_parties[0].address.unit: |
+    undefine('service_list')
+  other_parties[0].address.city: |
+    undefine('service_list')
+  other_parties[0].address.state: |
+    undefine('service_list')
+  other_parties[0].address.zip: |
+    undefine('service_list')
+  other_parties[0].last_address_known: |
+    undefine('service_list')
+  other_parties[0].has_job: |
+    undefine('service_list')
+  other_parties[0].employer_address.address: |
+    undefine('service_list')
+  other_parties[0].employer_address.unit: |
+    undefine('service_list')
+  other_parties[0].employer_address.city: |
+    undefine('service_list')
+  other_parties[0].employer_address.state: |
+    undefine('service_list')
+  other_parties[0].employer_address.zip: |
+    undefine('service_list')
+---
+#reconsider: True
 code: |
   service_list = []
   if other_parties[0].address_known:
@@ -2369,7 +2394,37 @@ fields:
   - no label: other_parties[0].bonus_service_check
     datatype: yesnoradio
 ---
-reconsider: True
+on change:
+  other_parties[0].address_known: |
+    undefine('alt_service_list')
+  other_parties[0].address.address: |
+    undefine('alt_service_list')
+  other_parties[0].address.unit: |
+    undefine('alt_service_list')
+  other_parties[0].address.city: |
+    undefine('alt_service_list')
+  other_parties[0].address.state: |
+    undefine('alt_service_list')
+  other_parties[0].address.zip: |
+    undefine('alt_service_list')
+  other_parties[0].last_address_known: |
+    undefine('alt_service_list')
+  other_parties[0].has_job: |
+    undefine('alt_service_list')
+  other_parties[0].employer_address.address: |
+    undefine('alt_service_list')
+  other_parties[0].employer_address.unit: |
+    undefine('alt_service_list')
+  other_parties[0].employer_address.city: |
+    undefine('alt_service_list')
+  other_parties[0].employer_address.state: |
+    undefine('alt_service_list')
+  other_parties[0].employer_address.zip: |
+    undefine('alt_service_list')
+  other_parties[0].which_address: |
+    undefine('alt_service_list')
+---
+#reconsider: True
 code: |
   alt_service_list = []
   if other_parties[0].which_address != "home_address":
@@ -2414,6 +2469,12 @@ fields:
       variable: other_parties[0].which_bonus_address
       is: "service_address"
 ---
+on change: 
+  protect_whom: |
+    undefine('check_ages')
+  others_protected[i].birthdate: |
+    undefine('check_ages')
+---
 reconsider: True
 code: |
   any_minors = False
@@ -2427,7 +2488,84 @@ code: |
           any_adults = True
   check_ages = True
 ---
-reconsider: True
+on change: 
+  protection_requested['away_places']: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_place_types: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  home.address: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  home.unit: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  home.city: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  home.state: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  home.zip: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_workplace.name: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_workplace.address: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_workplace.unit: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_workplace.city: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_workplace.state: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_workplace.zip: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_school.name: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_school.address: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_school.unit: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_school.city: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_school.state: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_school.zip: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_day_care.name: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_day_care.address: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_day_care.unit: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_day_care.city: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_day_care.state: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+  protected_day_care.zip: |
+    undefine('cook_stay_away_addresses')
+    undefine('state_stay_away_addresses')
+---
+#reconsider: True
 code: |
   if protection_requested['away_places']:
     away_address_list.clear()
@@ -2451,7 +2589,7 @@ code: |
     away_address_list.there_is_another = False
   cook_stay_away_addresses = True
 ---
-reconsider: True
+#reconsider: True
 code: |
   if protection_requested['away_places']:
     #away_work_address_list.clear()
@@ -2563,7 +2701,7 @@ question: |
 subquestion: |    
   Your forms are ready. View and download your forms below. Click **Make changes** to fix any mistakes.
 
-  This program does not file your ${ form_name } forms with the court. You will need to do this yourself.
+  This program **does not file** your ${ form_name } forms with the court. You will need to do this yourself.
 
   ${ action_button_html(url_action('review_answers'), label=':edit: Make changes', color='success', size="md") }
   
@@ -2573,7 +2711,7 @@ subquestion: |
 
   ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
 
-  **Note:** This program does not file your ${ form_name } forms with the court. You will need to do this yourself.
+  **Note:** This program **does not file your ${ form_name } forms with the court. You will need to do this yourself.
   
   Thank you for using ILAO Easy Forms!
 event: get_docs_screen
@@ -4043,7 +4181,11 @@ review:
   - Edit: other_parties[0].has_vehicle
     button: |  
       **Does ${other_parties[0].name.full(middle='full')} have access to a vehicle?**
+      % if other_parties[0].has_vehicle is None:
+      I don't know
+      % else:
       ${word(yesno(other_parties[0].has_vehicle))}
+      % endif
   - Edit: other_parties[0].license_plate
     button: |
       **${other_parties[0].name.full(middle='full')}'s vehicle information:**
@@ -4394,44 +4536,26 @@ confirm: True
 table: other_ops.table
 rows: other_ops
 columns:
+  - People involved: |
+      row_item.name.text if defined("row_item.name.text") else ""
   - Year: |
-      row_item.name.text if defined("row_item.year") else ""
+      row_item.year if defined("row_item.year") else ""
   - Details: |
-      action_button_html(url_action(row_item.attr_name("review_case")), label="Edit", icon="pencil-alt")
+      action_button_html(url_action(row_item.attr_name("name.text")), label="Edit", icon="pencil-alt")
 delete buttons: True
 confirm: True
 ---
 table: other_cases.table
 rows: other_cases
 columns:
+  - People involved: |
+      row_item.name.text if defined("row_item.name.text") else ""
   - Year: |
-      row_item.name.text if defined("row_item.year") else ""
+      row_item.year if defined("row_item.year") else ""
   - Details: |
-      action_button_html(url_action(row_item.attr_name("review_op")), label="Edit", icon="pencil-alt")
+      action_button_html(url_action(row_item.attr_name("name.text")), label="Edit", icon="pencil-alt")
 delete buttons: True
 confirm: True
----
-id: op review screen
-continue button field: x.review_op
-generic object: Thing
-question: |
-  Edit the protective order
-review: 
-  - Edit: x.name.text
-    button: |
-      **People involved**:
-      ${x.name.text}
----
-id: case review screen
-continue button field: x.review_case
-generic object: Thing
-question: |
-  Edit the case
-review: 
-  - Edit: x.name.text
-    button: |
-      **People involved**:
-      ${x.name.text}
 ---
 id: incident review screen
 continue button field: x.review_events
@@ -4496,24 +4620,33 @@ review:
     button: |
       **What do you want ${other_parties[0].name.full(middle='full')} to do?**
       
-      % if protection_requested['away_people'] and trial_court_index == -1:
+      % if protection_requested['away_people']:
       * Stay away from me and others
       % endif
       % if protection_requested['no_contact']:
-      * Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people
+      * Stop contacting me and others whether in person, by phone, by e-mail, by note, or by sending messages through other people
       % endif
-      % if protection_requested['away_places'] and trial_court_index == -1:
+      % if protection_requested['away_places']:
       * Stay away from the locations of the victim, victim's family and household member's work or school
       % endif
       % if protection_requested['away_property']:
       * Stay away from my pets and property
       % endif
-      % if protection_requested['away_people'] and trial_court_index != -1:
+    show if: trial_court_index == -1
+  - Edit: protection_requested
+    button: |
+      **What do you want ${other_parties[0].name.full(middle='full')} to do?**
+      
+      % if protection_requested['away_people']:
       * Stay away from me and others, and not take, hide, or damage any of my property or pets
       % endif
-      % if protection_requested['away_places'] and trial_court_index != -1:
-      * Stay away from the locations of the victim, victim's family and household member's home, work, school, or daycare
+      % if protection_requested['no_contact']:
+      * Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people
       % endif
+      % if protection_requested['away_places']:
+      * Stay away from the locations of the victim, victim's family and household member's home, work, school, or daycare
+      % endif  
+    show if: trial_court_index != -1
   - Edit: distance_state
     button: |
       **How far should ${other_parties[0].name.full(middle='full')} stay away?**
@@ -4889,24 +5022,33 @@ review:
     button: |
       **What do you want ${other_parties[0].name.full(middle='full')} to do?**
       
-      % if protection_requested['away_people'] and trial_court_index == -1:
+      % if protection_requested['away_people']:
       * Stay away from me and others
       % endif
       % if protection_requested['no_contact']:
-      * Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people
+      * Stop contacting me and others whether in person, by phone, by e-mail, by note, or by sending messages through other people
       % endif
-      % if protection_requested['away_places'] and trial_court_index == -1:
+      % if protection_requested['away_places']:
       * Stay away from the locations of the victim, victim's family and household member's work or school
       % endif
       % if protection_requested['away_property']:
       * Stay away from my pets and property
       % endif
-      % if protection_requested['away_people'] and trial_court_index != -1:
+    show if: trial_court_index == -1
+  - Edit: protection_requested
+    button: |
+      **What do you want ${other_parties[0].name.full(middle='full')} to do?**
+      
+      % if protection_requested['away_people']:
       * Stay away from me and others, and not take, hide, or damage any of my property or pets
       % endif
-      % if protection_requested['away_places'] and trial_court_index != -1:
-      * Stay away from the locations of the victim, victim's family and household member's home, work, school, or daycare
+      % if protection_requested['no_contact']:
+      * Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people
       % endif
+      % if protection_requested['away_places']:
+      * Stay away from the locations of the victim, victim's family and household member's home, work, school, or daycare
+      % endif  
+    show if: trial_court_index != -1
   - Edit: distance_state
     button: |
       **How far should ${other_parties[0].name.full(middle='full')} stay away?**
@@ -5169,7 +5311,11 @@ review:
   - Edit: other_parties[0].has_vehicle
     button: |  
       **Does ${other_parties[0].name.full(middle='full')} have access to a vehicle?**
+      % if other_parties[0].has_vehicle is None:
+      I don't know
+      % else:
       ${word(yesno(other_parties[0].has_vehicle))}
+      % endif
   - Edit: other_parties[0].license_plate
     button: |
       **${other_parties[0].name.full(middle='full')}'s vehicle information:**
