@@ -977,20 +977,24 @@ fields:
         trial_court_index == -1  
     js show if: |  
       val("protection_requested['away_places']") === true
-validation code: |
-  if trial_court_index == -1:
-    if protection_requested['away_people'] or protection_requested['away_places']:
-      if distance_people > distance_places:
-        distance_state = distance_people
-      else:
-        distance_state = distance_places
-    elif protection_requested['away_people']:
-      distance_state = distance_people
-    elif protection_requested['away_places']:
-      distance_state = distance_places
-  elif protection_requested['away_people'] or protection_requested['away_places']:
-    distance_people = distance_state
-    distance_places = distance_state
+#validation code: |
+#  if trial_court_index == -1:
+#    if protection_requested['away_people'] or protection_requested['away_places']:
+#      if distance_people > distance_places:
+#        distance_state = distance_people
+#      else:
+#        distance_state = distance_places
+#    elif protection_requested['away_people']:
+#      distance_state = distance_people
+#    elif protection_requested['away_places']:
+#      distance_state = distance_places
+#  elif protection_requested['away_people'] or protection_requested['away_places']:
+#    distance_people = distance_state
+#    distance_places = distance_state
+---
+on change: 
+  trial_court_index: |
+    undefine('protection_requested')
 ---
 template: stay_away_contact
 subject: |
