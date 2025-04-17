@@ -67,6 +67,7 @@ code: |
   sees_nav_bar
   snapshot_start
   instructions
+  set_progress(5)
   first_response_note
   cnco_explainer
   accept_terms  
@@ -91,7 +92,8 @@ code: |
   hide_address
   users[0].address.address
   other_parties[0].name.first
-
+  set_progress(20)
+  
   if protect_whom["minor"] or protect_whom["adult"]:
     others_protected.gather()
     pop_protected_code
@@ -129,6 +131,7 @@ code: |
   other_parties[0].anything_else
   if protection_requested.all_false() and not other_parties[0].anything_else:
     other_parties[0].no_protection_chosen
+  set_progress(40)
   
   nav.set_section('section_respondent')
   if trial_court_index == -1:
@@ -154,6 +157,7 @@ code: |
     other_parties[0].address.address
   else:
     unknown_address_note
+  set_progress(60)
   if trial_court_index == -1:
     respondent_on_social_media
   if other_parties[0].has_job == True:
@@ -171,7 +175,8 @@ code: |
   else:
     if respondent_jail_check:
       respondent_jail_name
-  
+
+  set_progress(80)
   nav.set_section('section_filing_info')
   if service_method == "sheriff" and service_state != "IL":
     service_county
@@ -196,7 +201,6 @@ code: |
   if trial_court_index == -1:
     #make_report_list
     cook_stay_away_addresses
-    case_types_logic
   state_stay_away_addresses
 
   pop_protected_code
@@ -205,9 +209,8 @@ code: |
   forms_assembling
   adult_minor_sorting
   snapshot_forms
+  set_progress(100)
   get_docs_screen
-
-
 ---
 code: |
   stuff_to_snapshot = {
@@ -252,12 +255,7 @@ code: |
       others_protected[i].address.address
   others_protected[i].complete = True
 ---
-on change:
-  protect_whom: |
-    undefine('pop_protected_code')
-  others_protected[i].why_include: |
-    undefine('pop_protected_code')
----
+reconsider: True
 code: |
   popping_index = 0
   if (protect_whom["minor"] or protect_whom["adult"]):
@@ -1251,20 +1249,6 @@ terms:
   - "e-signature": |
       An e-signature is an electronic signature. It is a digital version of a signature that has the same effect as a hand-written signature.
 ---
-on change:
-  protect_whom: |
-    undefine('adult_minor_sorting')
-  others_protected[i].name.first: |
-    undefine('adult_minor_sorting')
-  others_protected[i].name.middle: |
-    undefine('adult_minor_sorting')
-  others_protected[i].name.last: |
-    undefine('adult_minor_sorting')
-  others_protected[i].name.suffix: |
-    undefine('adult_minor_sorting')
-  others_protected[i].birthdate: |
-    undefine('adult_minor_sorting')
----
 reconsider: True
 code: |
   minors_protected.clear()
@@ -2049,32 +2033,6 @@ fields:
       - No: No
       - I don't know.: I don't know
 ---
-on change:
-  trial_court_index: |
-    undefine('case_types_logic')
-  previous_cook_case_type: |
-    undefine('case_types_logic')
---- 
-code: |
-  previous_divorce = False
-  previous_parentage = False
-  #if trial_court_index == -1:
-  #  if has_other_cases == True:
-  #    for case in other_cases:
-  #      if case.previous_cook_case_type == "divorce":
-  #        previous_divorce = True
-  #        divorce_case = case
-  #      elif case.previous_cook_case_type == "parentage":
-  #        previous_parentage = True
-  #        parentage_case = case
-
-  if trial_court_index == -1:
-    if previous_cook_case_type == "divorce":
-      previous_divorce = True
-    elif previous_cook_case_type == "parentage":
-      previous_parentage = True
-  case_types_logic = True
----
 id: any previous cook cases
 question: |
   Have you filed any divorce or parentage cases with ${other_parties[0].name.full(middle="full")} in Cook County before?
@@ -2299,36 +2257,9 @@ content: |
 #  else:
 #    list_employer_address = False
 #    employer_address_text = ""
+
 ---
-on change:
-  other_parties[0].address_known: |
-    undefine('service_list')
-  other_parties[0].address.address: |
-    undefine('service_list')
-  other_parties[0].address.unit: |
-    undefine('service_list')
-  other_parties[0].address.city: |
-    undefine('service_list')
-  other_parties[0].address.state: |
-    undefine('service_list')
-  other_parties[0].address.zip: |
-    undefine('service_list')
-  other_parties[0].last_address_known: |
-    undefine('service_list')
-  other_parties[0].has_job: |
-    undefine('service_list')
-  other_parties[0].employer_address.address: |
-    undefine('service_list')
-  other_parties[0].employer_address.unit: |
-    undefine('service_list')
-  other_parties[0].employer_address.city: |
-    undefine('service_list')
-  other_parties[0].employer_address.state: |
-    undefine('service_list')
-  other_parties[0].employer_address.zip: |
-    undefine('service_list')
----
-#reconsider: True
+reconsider: True
 code: |
   service_list = []
   if other_parties[0].address_known:
@@ -2398,37 +2329,7 @@ fields:
   - no label: other_parties[0].bonus_service_check
     datatype: yesnoradio
 ---
-on change:
-  other_parties[0].address_known: |
-    undefine('alt_service_list')
-  other_parties[0].address.address: |
-    undefine('alt_service_list')
-  other_parties[0].address.unit: |
-    undefine('alt_service_list')
-  other_parties[0].address.city: |
-    undefine('alt_service_list')
-  other_parties[0].address.state: |
-    undefine('alt_service_list')
-  other_parties[0].address.zip: |
-    undefine('alt_service_list')
-  other_parties[0].last_address_known: |
-    undefine('alt_service_list')
-  other_parties[0].has_job: |
-    undefine('alt_service_list')
-  other_parties[0].employer_address.address: |
-    undefine('alt_service_list')
-  other_parties[0].employer_address.unit: |
-    undefine('alt_service_list')
-  other_parties[0].employer_address.city: |
-    undefine('alt_service_list')
-  other_parties[0].employer_address.state: |
-    undefine('alt_service_list')
-  other_parties[0].employer_address.zip: |
-    undefine('alt_service_list')
-  other_parties[0].which_address: |
-    undefine('alt_service_list')
----
-#reconsider: True
+reconsider: True
 code: |
   alt_service_list = []
   if other_parties[0].which_address != "home_address":
@@ -2473,12 +2374,6 @@ fields:
       variable: other_parties[0].which_bonus_address
       is: "service_address"
 ---
-on change: 
-  protect_whom: |
-    undefine('check_ages')
-  others_protected[i].birthdate: |
-    undefine('check_ages')
----
 reconsider: True
 code: |
   any_minors = False
@@ -2492,84 +2387,7 @@ code: |
           any_adults = True
   check_ages = True
 ---
-on change: 
-  protection_requested['away_places']: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_place_types: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  home.address: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  home.unit: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  home.city: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  home.state: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  home.zip: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_workplace.name: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_workplace.address: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_workplace.unit: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_workplace.city: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_workplace.state: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_workplace.zip: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_school.name: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_school.address: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_school.unit: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_school.city: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_school.state: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_school.zip: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_day_care.name: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_day_care.address: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_day_care.unit: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_day_care.city: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_day_care.state: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
-  protected_day_care.zip: |
-    undefine('cook_stay_away_addresses')
-    undefine('state_stay_away_addresses')
----
-#reconsider: True
+reconsider: True
 code: |
   if protection_requested['away_places']:
     away_address_list.clear()
@@ -2577,7 +2395,9 @@ code: |
     if protected_place_types['Home']:
       away_address_list.append(home.on_one_line(bare=True))
     if protected_place_types['Workplace']:
-      workplace_text = protected_workplace.name + ", " + protected_workplace.on_one_line(bare=True)
+      workplace_text = protected_workplace.name
+      workplace_text += ", " 
+      workplace_text += protected_workplace.on_one_line(bare=True)
       away_address_list.append(workplace_text)
     if protected_place_types['School']:
       school_text = protected_school.name + ", " + protected_school.on_one_line(bare=True)
@@ -3673,10 +3493,10 @@ attachment:
     - "cnco_petition": ${ True }
     - "involves_minors_yes": ${ True if any_minors else '' }
     - "involves_minors_no": ${ True if not any_minors else '' }
-    - "previous_divorce_yes": ${previous_divorce}
-    - "previous_divorce_no": ${ False if previous_divorce else True}
-    - "previous_parentage_yes": ${previous_parentage}
-    - "previous_parentage_no": ${ False if previous_parentage else True}
+    - "previous_divorce_yes": ${True if previous_cook_case_type == "divorce" else False}
+    - "previous_divorce_no": ${False if previous_cook_case_type == "divorce" else True}
+    - "previous_parentage_yes": ${True if previous_cook_case_type == "parentage" else False}
+    - "previous_parentage_no": ${False if previous_cook_case_type == "parentage" else True}
     - "previous_cook_case_date": ${previous_cook_case_date}
     - "previous_cook_case_number": ${previous_cook_case_number}
     - "previous_cook_case_judge": ${previous_cook_case_judge}
