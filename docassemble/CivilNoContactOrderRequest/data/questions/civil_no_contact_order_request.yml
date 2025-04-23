@@ -184,7 +184,6 @@ code: |
     other_parties[0].which_address
     if other_parties[0].bonus_service_check == True:
       other_parties[0].which_bonus_address
-      #if other_parties[0].phone_number != "" or other_parties[0].email_address != "" or (trial_court_index == -1 and other_parties[0].mobile_number != ""):
       if other_parties[0].bonus_contact_info:
         other_parties[0].alt_email 
   if trial_court_index == -1 and service_method == "sheriff":  
@@ -199,14 +198,12 @@ code: |
   check_ages
   
   if trial_court_index == -1:
-    #make_report_list
     cook_stay_away_addresses
   state_stay_away_addresses
 
-  pop_protected_code
-  #debug_page
-  addendum_check
+  pop_protected_code  
   forms_assembling
+  addendum_check
   adult_minor_sorting
   snapshot_forms
   set_progress(100)
@@ -366,7 +363,6 @@ subquestion: |
   * Stay away from specific places like a home, a school, a daycare, or an office, and
   * Transfer to another school, if the victim and the abuser attend the same school.
 ---
-#consult sme
 id: content warning
 continue button field: content_warning
 question: |
@@ -472,15 +468,6 @@ code: |
         filtered_courts.append((court[0],court_name))
     return sorted( filtered_courts, key=lambda y: y[1])
 ---
-#depends on:
-#  - trial_court_index
-#code: |
-#  if trial_court_index == -1:
-#    trial_court = court_list.as_court('trial_court', 15)
-#    trial_court.address.county = "Cook"
-#  else:
-#    trial_court = court_list.as_court('trial_court', trial_court_index)
----
 depends on:
   - trial_court_index
 code: |
@@ -543,15 +530,9 @@ depends on:
   - protect_whom["adult"]
 code: |
   if protect_whom['minor'] or protect_whom['adult']:
-    others_protected.there_are_any = True
-    #need_to_gather_others = True    
+    others_protected.there_are_any = True 
   else:
     others_protected.there_are_any = False
-    #need_to_gather_others = False  
----
-
-code: |
-  
 ---
 id: petitioner name
 sets:
@@ -925,8 +906,6 @@ fields:
     maxlength: 200
     input type: area
 ---
-#This c
----
 id: protection requested
 question: |
   What do you want the court to make ${other_parties[0].name.full(middle='full')} to do?
@@ -975,20 +954,6 @@ fields:
         trial_court_index == -1  
     js show if: |  
       val("protection_requested['away_places']") === true
-#validation code: |
-#  if trial_court_index == -1:
-#    if protection_requested['away_people'] or protection_requested['away_places']:
-#      if distance_people > distance_places:
-#        distance_state = distance_people
-#      else:
-#        distance_state = distance_places
-#    elif protection_requested['away_people']:
-#      distance_state = distance_people
-#    elif protection_requested['away_places']:
-#      distance_state = distance_places
-#  elif protection_requested['away_people'] or protection_requested['away_places']:
-#    distance_people = distance_state
-#    distance_places = distance_state
 ---
 on change: 
   trial_court_index: |
@@ -1374,25 +1339,6 @@ fields:
     show if: 
       variable: other_parties[0].race
       is: "Other"  
-  #- Skin tone: other_parties[0].skin
-  #  input type: radio
-  #  required: False
-  #  show if:
-  #    variable: trial_court.address.county
-  #    is: "Cook"
-  #  choices:
-  #    - Very light: Very light
-  #    - Light: Light
-  #    - Light brown: Light brown
-  #    - Olive: Olive
-  #    - Brown: Brown
-  #    - Dark brown: Dark brown
-  #    - Other: Other
-  #- Other: respondent_skin_other
-  #  maxlength: 20
-  #  show if: 
-  #    variable: other_parties[0].skin
-  #    is: "Other"  
 ---
 id: abuser any other names
 question: |
@@ -1582,62 +1528,6 @@ fields:
       - Sometimes: Sometimes
       - No: No
 ---
-#id: abuser height abuser weight
-#question: |
-#  What is ${other_parties[0].name.full(middle='full')}'s height and weight?
-#subquestion: |
-#  If you do not know, you can leave this blank. 
-#fields:
-#  - Feet: other_parties[0].height_feet
-#    datatype: integer
-#    required: False
-#    grid: 6
-#    min: 1
-#    max: 9
-#    help: |
-#      Example: 5
-#  - Inches: other_parties[0].height_inches
-#    datatype: integer
-#    required: False
-#    min: 0
-#    max: 11
-#    grid: 6
-#    help: |
-#      Example: 8
-#  - Weight (in pounds): other_parties[0].weight
-#    datatype: integer
-#    required: False
-#    min: 1
-#    max: 1500
-#    help: |
-#      Example: 170
-#---
-#id: abuser eyes
-#question: |
-#  What color are ${other_parties[0].name.full(middle='full')}'s hair and eyes?
-#subquestion: |
-#  If you do not know, you can leave this blank. 
-#fields:
-#  - Hair color: other_parties[0].hair
-#    maxlength: 30
-#    required: False
-#    help: |
-#      Examples: brown, black, blond, gray, bald or shaved
-#  - Eye color: other_parties[0].eyes
-#    maxlength: 30
-#    required: False
-#    help: |
-#      Examples: brown, blue, hazel, green
-#  - Does ${other_parties[0].name.full(middle='full')} wear glasses?: other_parties[0].glasses
-#    datatype: radio
-#    required: False
-#    choices:
-#      - Yes: True
-#      - No: False
-#      - Sometimes: sometimes
-#      - I do not know: dont_know
----
-#check how much space is available
 id: abuser notable features
 question: |
   What are ${other_parties[0].name.full(middle='full')}'s notable features?
@@ -1688,16 +1578,6 @@ fields:
       val('respondent_jail_check') === true
     help: |
       If you do not know the name of the jail, you may leave this blank.
----
-#id: abuser jail name
-#question: |
-#  Where is ${other_parties[0].name.full(middle='full')} incarcerated?
-#subquestion: |
-#    If you do not know, you may leave this blank.
-#fields:
-#  - Name of prison or jail: respondent_jail_name
-#    maxlength: 50
-#    required: False
 ---
 id: abuser probation
 question: |
@@ -1783,15 +1663,6 @@ fields:
     maxlength: 40
     help: |
       For example, this could be "military ID number" or "passport number."
----
-#id: abuser another number
-#question: |
-#  What is ${other_parties[0].name.full(middle='full')} other identifying number?
-#fields:
-#  - Number: other_parties[0].another_number
-#  - Describe the ID number: other_parties[0].another_number_description
-#    help: |
-#      For example, this could be "military ID number" or "passport number."
 ---
 id: respondent social media
 question: |
@@ -2094,10 +1965,6 @@ fields:
     max: ${ today().year }
     code: |
       reversed(range(today().year-120, today().year+1))
-#validation code: |
-#  if other_cases[i].state == "IL" and other_cases[i].county == "Cook":
-#    if other_cases[i].previous_cook_case_type == "divorce" or other_cases[i].previous_cook_case_type == "parentage":
-#      other_cases[i].year = other_cases[i].cook_case_date.year
 ---
 id: more cases
 question: |
@@ -2242,23 +2109,6 @@ subject: |
 content: |  
   You can use this **[City-to-County Finder](https://www.statsamerica.org/CityCountyFinder/)** to find the county.
 ---
-#This code block generates options for the dropdown menu in the question asking which address the sheriff should serve the abuser at.
-#reconsider: True
-#code: |
-#  if other_parties[0].address_known:
-#    list_home_address = True
-#    home_address_text = other_parties[0].address.on_one_line(bare=True)
-#  else:
-#    list_home_address = False
-#    home_address_text = ""
-#  if other_parties[0].has_job and other_parties[0].employer_address.address != "":
-#    list_employer_address = True
-#    employer_address_text = other_parties[0].employer_address.on_one_line(bare=True)
-#  else:
-#    list_employer_address = False
-#    employer_address_text = ""
-
----
 reconsider: True
 code: |
   service_list = []
@@ -2280,12 +2130,6 @@ fields:
   - no label: other_parties[0].which_address
     input type: radio
     code: service_list
-    #choices:
-    #  - ${home_address_text}: home_address
-    #    show if: list_home_address
-    #  - ${employer_address_text}: employer_address
-    #    show if: list_employer_address
-    #  - An address I will enter: add_service_address
   - Street address: other_parties[0].service_address.address
     address autocomplete: True
     required: False
@@ -2407,30 +2251,21 @@ code: |
       day_care_text = protected_day_care.name + ", " + protected_day_care.on_one_line(bare=True)
       away_address_list.append(day_care_text)
       away_school_daycare_list.append(day_care_text)
-    #if protected_place_types['School'] or protected_place_types['Workplace']: 
-    #  for place in employers_schools:
-    #    away_address_list.append(place.address.on_one_line(bare=True))
     away_address_list.there_is_another = False
   cook_stay_away_addresses = True
 ---
-#reconsider: True
+reconsider: True
 code: |
   if protection_requested['away_places']:
-    #away_work_address_list.clear()
     away_school_daycare_list.clear()
-    #if protected_place_types['School'] or protected_place_types['Workplace']: 
-    #  for place in employers_schools:
-    #    if place.type == "work":
-    #      away_work_address_list.append(place.address.on_one_line(bare=True))
-    #    else:
-    #      away_school_daycare_list.append(place.address.on_one_line(bare=True))
+    
     if protected_place_types['School']:
       school_text = protected_school.name + ", " + protected_school.on_one_line(bare=True)
       away_school_daycare_list.append(school_text)
     if protected_place_types['day_care']:
       day_care_text = protected_day_care.name + ", " + protected_day_care.on_one_line(bare=True)
       away_school_daycare_list.append(day_care_text)
-    #away_work_address_list.there_is_another = False
+
     away_school_daycare_list.there_is_another = False
   state_stay_away_addresses = True
 ---
@@ -2451,7 +2286,6 @@ buttons:
   - Restart: restart
 ---
 id: jurisdiction
-#continue button field: jurisdiction
 question: |
   Why do you want to file in ${ end_in_county(trial_court.address.county)}?
 subquestion: |
@@ -2463,25 +2297,6 @@ fields:
       - I or the person I want to protect lives in ${ trial_court.address.county } County.: I live here
       - The person I am filing against lives in ${ trial_court.address.county } County.: Respondent lives here
       - The abuse took place in ${ trial_court.address.county } County.: Abuse was here              
----
-#creates list of police report numbers and sets any police reports flag
-#reconsider: True
-#code: |
-#  report_numbers.clear()
-#  any_police_reports = False
-#  report_numbers_on_addendum = False
-#  for index, event in enumerate(abusive_acts):
-#    if index < 3:
-#      if event.police_check:
-#        any_police_reports = True
-#        if event.police_number != "":
-#          report_numbers.append(event.police_number)
-#    else:
-#      if event.police_check:
-#        any_police_reports = True
-#        report_numbers_on_addendum = True
-#  report_numbers.there_is_another = False
-#  make_report_list = True
 ---
 id: whats next
 continue button field: whats_next
@@ -2535,7 +2350,7 @@ subquestion: |
 
   ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
 
-  **Note:** This program **does not file your ${ form_name } forms with the court. You will need to do this yourself.
+  **Note:** This program **does not file** your ${ form_name } forms with the court. You will need to do this yourself.
   
   Thank you for using ILAO Easy Forms!
 event: get_docs_screen
@@ -2772,7 +2587,7 @@ attachment:
     - "no_school": ${True if same_school and prohibit_school else False}
     - "restrained_school_name": |
         % if same_school and prohibit_school:
-        % if which_school == protected_school:
+        % if which_school == "protected_school":
         ${protected_school.name}
         % else:
         ${other_school.name}
@@ -2780,7 +2595,7 @@ attachment:
         % endif
     - "restrained_school_address": |
         % if same_school and prohibit_school:
-        % if which_school == protected_school:
+        % if which_school == "protected_school":
         ${protected_school.on_one_line(bare=True)}
         % else:
         ${other_school.on_one_line(bare=True)}
@@ -2800,7 +2615,7 @@ attachment:
     - "no_property": ${protection_requested["away_people"]}
     - "other_relief_check": ${other_parties[0].anything_else}
     - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
-    - "e_signature": ${ "/s/ " + users[0].name.full(middle='full') if e_signature else ""}
+    - "e_signature": ${users[0].name.full(middle='full') if e_signature else ""}
     - "petitioner_name": ${users[0].name.full(middle='full')}
     - "petitioner_address_line_1": ${ users[0].address.line_one(bare=True)}
     - "petitioner_address_line_2": ${ users[0].address.line_two()}
@@ -2867,7 +2682,7 @@ attachment:
     - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "other_protected_address_2": |
         % if (protect_whom["minor"] or protect_whom["adult"]):
-        % if hide_address and others_protected[0].use_safe_address:
+        % if hide_address and others_protected[1].use_safe_address:
         ${users[0].address.on_one_line(bare=True)}
         % else:
         ${others_protected[1].address.on_one_line(bare=True)}
@@ -2907,7 +2722,6 @@ attachment:
     - "respondent_plate": ${other_parties[0].license_plate if other_parties[0].has_vehicle else ""}
     - "respondent_other_id_number": ${other_parties[0].another_number if other_parties[0].another_number_check else ""}
     - "respondent_other_id_description": ${other_parties[0].another_number_description if other_parties[0].another_number_check else ""}
-    #Add questions about an incarcerated respondent?
     - "respondent_jail_check": ${respondent_jail_check}
     - "respondent_jail_name": ${respondent_jail_name}
     - "respondent_address_unknown": ${False if other_parties[0].address_known else True}
@@ -3004,7 +2818,7 @@ attachment:
     - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "other_protected_address_2": |
         % if (protect_whom["minor"] or protect_whom["adult"]):
-        % if hide_address and others_protected[0].use_safe_address:
+        % if hide_address and others_protected[1].use_safe_address:
         ${users[0].address.on_one_line(bare=True)}
         % else:
         ${others_protected[1].address.on_one_line(bare=True)}
@@ -3044,7 +2858,6 @@ attachment:
     - "respondent_plate": ${other_parties[0].license_plate if other_parties[0].has_vehicle else ""}
     - "respondent_other_id_number": ${other_parties[0].another_number if other_parties[0].another_number_check else ""}
     - "respondent_other_id_description": ${other_parties[0].another_number_description if other_parties[0].another_number_check else ""}
-    #Add questions about an incarcerated respondent?
     - "respondent_jail_check": ${respondent_jail_check}
     - "respondent_jail_name": ${respondent_jail_name}
     - "respondent_address_unknown": ${False if other_parties[0].address_known else True}
@@ -3197,12 +3010,10 @@ attachment:
     - "respondent": ${other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
     - "respondent_birth_date": ${other_parties[0].birthdate}
-    #What does it mean for an CNCO to be an independent proceeding, cirminal proceeding, or deliquency petition? 
     - "independent": ${True}
     - "emergency_check": ${order_type['emergency']}
     - "plenary_check": ${order_type['plenary']}
     - "petitioner_name": ${users[0].name.full(middle='full')}
-    #These child name and adult name variables seem to be distinct from the others protected list. How should they be populated?
     - "child_name": ${child_list if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "adult_name": ${adult_list if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "safe_address": ${hide_address}
@@ -3334,7 +3145,6 @@ attachment:
   pdf template file: cook_sheriff_info_sheet.pdf
   fields:
     - "respondent": ${other_parties[0].name.full(middle="full")}
-    #- "case_number__1": ${ "" }
     - "alias_names": ${ other_parties[0].alias_names if other_parties[0].has_alias else ""}
     - "respondent_race": ${ respondent_race_other if other_parties[0].race == 'Other' else other_parties[0].race }
     - "respondent_dob": |
@@ -3623,7 +3433,6 @@ attachment:
     - "petitioner_name_and_address": |
         ${users[0].name.full(middle='full')}, ${users[0].address.on_one_line(bare=True)}
     - "safe_address": ${hide_address}
-    #jump
     - "respondent_name_and_address": |
         ${other_parties[0].name.full(middle='full')}, ${other_parties[0].address.on_one_line(bare=True)}
     - "respondent_gender": |
@@ -4197,30 +4006,6 @@ review:
       * Judge: None entered
       % endif
     show if: trial_court_index == -1 and previous_cook_case_type != "none"	
-  #- Edit: other_parties[0].divorced_user
-  #  button: |
-  #    **Are you and ${other_parties[0].name.full(middle='full')} divorced?**
-  #    ${word(yesno(other_parties[0].divorced_user))}
-  #- Edit: other_parties[0].divorce_date
-  #  button: |
-  #    **Divorce case information:**
-  #    
-  #    * Date filed: ${other_parties[0].divorce_date}
-  #    * Case number: ${other_parties[0].divorce_number}
-  #    * Judge: ${other_parties[0].divorce_judge}
-  #  show if: other_parties[0].divorced_user
-  #- Edit: other_parties[0].parentage_action
-  #  button: |
-  #    **Have you and ${other_parties[0].name.full(middle='full')} filed a parentage action?**
-  #    ${word(yesno(other_parties[0].parentage_action))}
-  #- Edit: other_parties[0].parentage_date
-  #  button: |
-  #    **Parentage case information:**
-  #    
-  #    * Date filed: ${other_parties[0].parentage_date}
-  #    * Case number: ${other_parties[0].parentage_number}
-  #    * Judge: ${other_parties[0].parentage_judge} 
-  #  show if: other_parties[0].parentage_action
   - Edit: has_other_ops
     button: |
       **Has there been another protective order in any state against ${other_parties[0].name.full(middle='full')} involving you or other people you want to protect?**
@@ -4260,32 +4045,6 @@ review:
       ${word(yesno(respondent_jail_check))}
       % endif
     show if: trial_court_index != -1
-  #- Edit: other_parties[0].op_state
-  #  button: |
-  #    **Where was the Order of Protection issued?**
-  #    % if other_parties[0].op_state == "IL":
-  #    % if other_parties[0].op_in_state_county == "":
-  #    ${other_parties[0].op_state}
-  #    % else:
-  #    ${end_in_county(other_parties[0].op_in_state_county)}, ${other_parties[0].op_state}
-  #    % endif
-  #    % if other_parties[0].op_out_state_county == "":
-  #    ${other_parties[0].op_state}
-  #    % else:
-  #    ${end_in_county(other_parties[0].op_out_state_county)}, ${other_parties[0].op_state}
-  #    % endif
-  #    % endif
-  #  show if: other_parties[0].order_of_protection
-  #- Edit: respondent_on_probation
-  #  button: |
-  #    **Is ${other_parties[0].name.full(middle="full")} on probation?**
-  #    % if respondent_on_probation == "idk":
-  #    I don't know
-  #    % elif respondent_on_probation == "Yes":
-  #    Yes, in ${end_in_county(respondent_probation_county)}
-  #    % else:
-  #    No
-  #    % endif  
 ---
 section: What happened
 id: incidents review screen
@@ -4543,9 +4302,9 @@ review:
     show if: trial_court_index != -1 and protection_requested['away_places'] and protected_place_types['School']
   - Edit: prohibit_school
     button: |
-      **Do you want the court to prohibit ${other_parties[0].name.full(middle='full')} from attending the school?**
+      **What school do you want the court to prohibit ${other_parties[0].name.full(middle='full')} from attending?**
       % if not prohibit_school:
-      No
+      I do not want to prohibit ${other_parties[0].name.full(middle='full')} from attending any school.
       % elif which_school == "protected_school":
       ${protected_school.name}, ${protected_school.on_one_line(bare=True)}
       % else:
@@ -4945,9 +4704,9 @@ review:
     show if: trial_court_index != -1 and protection_requested['away_places'] and protected_place_types['School']
   - Edit: prohibit_school
     button: |
-      **Do you want the court to prohibit ${other_parties[0].name.full(middle='full')} from attending the school?**
+      **What school do you want the court to prohibit ${other_parties[0].name.full(middle='full')} from attending?**
       % if not prohibit_school:
-      No
+      I do not want to prohibit ${other_parties[0].name.full(middle='full')} from attending any school.
       % elif which_school == "protected_school":
       ${protected_school.name}, ${protected_school.on_one_line(bare=True)}
       % else:
@@ -5327,30 +5086,6 @@ review:
       * Judge: None entered
       % endif
     show if: trial_court_index == -1 and previous_cook_case_type != "none"	
-  #- Edit: other_parties[0].divorced_user
-  #  button: |
-  #    **Are you and ${other_parties[0].name.full(middle='full')} divorced?**
-  #    ${word(yesno(other_parties[0].divorced_user))}
-  #- Edit: other_parties[0].divorce_date
-  #  button: |
-  #    **Divorce case information:**
-  #    
-  #    * Date filed: ${other_parties[0].divorce_date}
-  #    * Case number: ${other_parties[0].divorce_number}
-  #    * Judge: ${other_parties[0].divorce_judge}
-  #  show if: other_parties[0].divorced_user
-  #- Edit: other_parties[0].parentage_action
-  #  button: |
-  #    **Have you and ${other_parties[0].name.full(middle='full')} filed a parentage action?**
-  #    ${word(yesno(other_parties[0].parentage_action))}
-  #- Edit: other_parties[0].parentage_date
-  #  button: |
-  #    **Parentage case information:**
-  #    
-  #    * Date filed: ${other_parties[0].parentage_date}
-  #    * Case number: ${other_parties[0].parentage_number}
-  #    * Judge: ${other_parties[0].parentage_judge} 
-  #  show if: other_parties[0].parentage_action
   - Edit: has_other_ops
     button: |
       **Has there been another protective order in any state against ${other_parties[0].name.full(middle='full')} involving you or other people you want to protect?**
