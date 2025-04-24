@@ -2524,7 +2524,7 @@ attachment:
     - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "other_protected_address_2": |
         % if (protect_whom["minor"] or protect_whom["adult"]):
-        % if hide_address and others_protected[0].use_safe_address:
+        % if hide_address and others_protected[1].use_safe_address:
         ${users[0].address.on_one_line(bare=True)}
         % else:
         ${others_protected[1].address.on_one_line(bare=True)}
@@ -3007,13 +3007,16 @@ attachment:
         ${others_protected.full_names()}
         % endif
         % endif
-    - "respondent": ${other_parties[0].name.full(middle='full')}
+    - "respondent_1": ${other_parties[0].name.full(middle='full')}
+    - "respondent_2": ${other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
     - "respondent_birth_date": ${other_parties[0].birthdate}
     - "independent": ${True}
-    - "emergency_check": ${order_type['emergency']}
+    - "emergency_check_1": ${order_type['emergency']}
+    - "emergency_check_2": ${order_type['emergency']}
     - "plenary_check": ${order_type['plenary']}
-    - "petitioner_name": ${users[0].name.full(middle='full')}
+    - "petitioner_name_1": ${users[0].name.full(middle='full')}
+    - "petitioner_name_2": ${users[0].name.full(middle='full')}
     - "child_name": ${child_list if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "adult_name": ${adult_list if (protect_whom["minor"] or protect_whom["adult"]) else ""}
     - "safe_address": ${hide_address}
@@ -3069,7 +3072,8 @@ attachment:
     - "no_property": ${protection_requested['away_property']}
     - "other_relief_check": ${other_parties[0].anything_else}
     - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
-    - "e_signature": ${ "/s/ " + users[0].name.full(middle='full') if e_signature else ""}
+    - "e_signature_1": ${users[0].name.full(middle='full') if e_signature else ""}
+    - "e_signature_2": ${users[0].name.full(middle='full') if e_signature else ""}
     - "user_name": ${users[0].name.full(middle='full')}
     - "user_address_line_one": ${ users[0].address.line_one(bare=True)}
     - "user_city": ${ users[0].address.city}
