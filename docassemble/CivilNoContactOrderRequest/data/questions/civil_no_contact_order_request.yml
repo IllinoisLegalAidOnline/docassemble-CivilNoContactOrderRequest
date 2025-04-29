@@ -2615,7 +2615,7 @@ attachment:
     - "no_property": ${protection_requested["away_people"]}
     - "other_relief_check": ${other_parties[0].anything_else}
     - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
-    - "e_signature": ${users[0].name.full(middle='full') if e_signature else ""}
+    - "e_signature": ${"/s/ " + users[0].name.full(middle='full') if e_signature else ""}
     - "petitioner_name": ${users[0].name.full(middle='full')}
     - "petitioner_address_line_1": ${ users[0].address.line_one(bare=True)}
     - "petitioner_address_line_2": ${ users[0].address.line_two()}
