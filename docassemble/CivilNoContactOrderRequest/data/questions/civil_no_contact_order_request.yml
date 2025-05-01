@@ -1,5 +1,5 @@
 metadata:
-  title: Civil No Contact Order
+  title: Sexual assault Civil No Contact Order
   short title: Civil No Contact Order
   comment: This program helps you ask the court to order someone abusing you to leave you alone. You can ask for a CNCO if you are a victim of rape, sexual assault, or sexual abuse.
   authors:
@@ -301,13 +301,13 @@ code: |
 ---
 id: welcome
 question: |
-  Civil No Contact Order
+  Sexual assault Civil No Contact Order
 subquestion: |
-  Welcome to Illinois Legal Aid Online's **Civil No Contact Order** Easy Form.
+  Welcome to Illinois Legal Aid Online's **Sexual assault Civil No Contact Order** Easy Form.
 
-  This program will help you make forms to ask for a Civil No Contact Order (CNCO) against someone who has abused you. You can ask for a CNCO if you are a victim of rape, sexual assault, or sexual abuse. The forms you make with this program can only be used in Illinois.
+  This program will help you make forms to ask for a Civil No Contact Order (CNCO) against someone who has abused you. You can ask for a CNCO if you are a survivor of rape, sexual assault, or sexual abuse. The forms you make with this program can only be used in Illinois.
 
-  If the victim of abuse is not you, but a child or an adult who is not capable of filing a petition, you may file a petition on behalf of the victim.
+  If the survivor of abuse is not you, but a child or an adult who is not capable of filing a petition, you may file a petition on behalf of the survivor.
 
   To learn more, read ILAO's article about [**starting a case to get a Civil No Contact Order**](https://www.illinoislegalaid.org/legal-information/starting-case-get-civil-no-contact-order).
   
@@ -325,13 +325,13 @@ question: |
 subquestion: |
   To use this program:
 
-  * You must be the victim of sexual assault or sexual abuse, and
-  * You must file your forms in the county were the abuse took place or in the county where you, the abuser, or someone you want to protect live.
+  * You must be the survivor of sexual assault or sexual abuse, and
+  * You must file your forms in the county were the abuse took place or in the county where you, the perpetrator, or someone you want to protect live.
   
   To complete this program you will need to know:
   
-  * An address where you can receive court documents if you do not want the abuser to know the address where you are staying,
-  * The abuser's name, and
+  * An address where you can receive court documents if you do not want the perpetrator to know the address where you are staying,
+  * The perpetrator's name, and
   * Details about the abuse and when it took place.
   
   Set aside 10 to 20 minutes to finish this program. You can login and save your work to continue later.
@@ -351,17 +351,17 @@ continue button field: cnco_explainer
 question: |
   About Civil No Contact Orders
 subquestion: |
-  A Civil No Contact Order (CNCO) is a protective order protects victims of rape, sexual assault, or sexual abuse from their abuser. The Order can also be used to protect the victim's family and rape crisis center workers. 
+  A Civil No Contact Order (CNCO) is a protective order protects survivors of rape, sexual assault, or sexual abuse from the perpetrator. The Order can also be used to protect the survivor's family and rape crisis center workers. 
 
   If you want to know what type of protective order is best for you, use ILAO's [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) tool to learn more.
 
-  With a CNCO, the court can make the abuser:
+  With a CNCO, the court can make the perpetrator:
 
-  * Stay away from the victim,
-  * Stop contacting the victim through telephone, computer, email, texts, mail, instant message, social media, or other people,
-  * Stay a certain distance away from the victim,
+  * Stay away from the survivor,
+  * Stop contacting the survivor through telephone, computer, email, texts, mail, instant message, social media, or other people,
+  * Stay a certain distance away from the survivor,
   * Stay away from specific places like a home, a school, a daycare, or an office, and
-  * Transfer to another school, if the victim and the abuser attend the same school.
+  * Transfer to another school, if the survivor and the perpetrator attend the same school.
 ---
 id: content warning
 continue button field: content_warning
@@ -384,19 +384,38 @@ subquestion: |
   * Call a rape crisis hotline. To find the nearest center and call its 24-hour hotline, go to the [**Illinois Coalition Against Sexual Assault website**](https://icasa.org/) or call (217) 753-4117.  For Chicago, you can contact the Chicago Rape Crisis Hotline online at [**Resilience**](https://www.ourresilience.org/) or call (888) 293-2080.
   * Call or text the 988 Lifeline at 988.  There is also an [**online chat service**](https://chat.988lifeline.org/).
 ---
+#replace the lengthy subquestion with a shorter summary and link to https://www.illinoislegalaid.org/legal-information/sexual-assault-and-civil-no-contact-orders-common-questions#whatissexualassault once the page is live
 id: experienced abuse
 question: |
-  Have you or the people you want to protect been the victim of sexual assault or sexual abuse?
+  Have you or the people you want to protect been the survivor of sexual assault or sexual abuse?
+subquestion: |
+  ${collapse_template(assault_conduct_define)}
 fields:
   - no label: experienced_abuse
     datatype: yesnoradio
+---
+template: assault_conduct_define
+subject: |
+  **Definitions of sexual assault and non-consensual sexual conduct**
+content: |
+  In Illinois, sexual assault occurs when a person engages in:
+
+  * Non-consensual sexual conduct, which includes as any intentional touching or contact with a person’s sexual organs, anus, or breast, or
+  *Non-consenual sexual penetration, which includes any contact between the sex organ or anus of one person with the other person’s sex organ, mouth, or anus. It also includes any insertion of any part of a person’s body or object into the sex organ or anus of the other.
+  
+  Non-consensual conduct means it is done without the consent of both people, and it includes situations where:
+  
+  * The perpetrator uses force or threatens to use force against the survivor,
+  * The perpetrator knows that the survivor is unable to understand what is happening or cannot give informed consent,
+  The perpetrator is a family member of the survivor, and the survivor is under 18 years old; or
+  The perpetrator is 17 years old or older and holds a position of trust, authority, or supervision over the survivor, and the survivor is between 13 and 17 years old.
 ---
 id: no abuse kickout
 event: no_abuse_kickout
 question: |
   Sorry
 subquestion: |
-  To qualify for a Civil No Contact Order, you or the people you want to protect must have been the victim of sexual assault or sexual abuse.
+  To qualify for a Civil No Contact Order, you or the people you want to protect must have been the survivor of sexual assault or sexual abuse.
   
   A different protective order may work for your situation. Use ILAO's [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) tool to learn more.
 buttons:
@@ -510,6 +529,8 @@ id: protect whom
 question: |
   Who do you want this Civil No Contact Order to protect?
 subquestion: |
+  You can file for a member of your family or your household so long as you have their consent.
+  
   You can file for minor children or high-risk adults who can't file for themselves. You do not need to be related to them.
   
   Check all that apply.
@@ -552,7 +573,7 @@ sets:
   - other_parties[0].name.first
 id: other parties name
 question: |
-  What is the abuser's name?
+  What is the perpetrator's name?
 subquestion: |
   This is the person you will file the Civil No Contact Order against. In court and on the forms, they will be listed as the **Respondent**.
 
@@ -565,7 +586,7 @@ id: hide address
 question: |
   Do you want to keep your home address hidden?
 subquestion: |
-  You do not need to list where you are staying on your court papers. You can give the court a mailing address where you can receive court notices instead.
+  You do not have to include your home address if disclosing it would risk you or someone in your family or household being abused. If you do not include your home address, you will need to enter a mailing address where you can receive court notices.
 field: hide_address
 choices:
   - Yes: True
@@ -757,7 +778,7 @@ fields:
         show if: protect_whom['me']
       - They are the family or household member of someone sexually assaulted or sexually abused by ${other_parties[0].name.full(middle='full')}.: other_household
         show if: protect_whom['minor'] or protect_whom['adult']
-      - They work for a rape crisis center providing services to a victim of ${other_parties[0].name.full(middle='full')}.: crisis_center
+      - They work for a rape crisis center providing services to a survivor of ${other_parties[0].name.full(middle='full')}.: crisis_center
 ---
 id: cannot include
 continue button field: others_protected[i].cannot_include
@@ -833,9 +854,12 @@ fields:
       The petition has space for about 800 characters including spaces for each incident.
       % endif
 ---
+#replace collapse template with link as noted in earlier page
 id: abuse type check
 question: |
   Did ${other_parties[0].name.full(middle='full')}'s actions involve any of the following?
+subquestion: |
+  ${collapse_template(assault_conduct_define)}
 fields:
   - no label: abuse_type
     datatype: checkboxes
@@ -862,7 +886,7 @@ fields:
 ---
 id: abusive act is there another
 question: |
-  Do you want to add another time ${other_parties[0].name.full(middle='full')} did sexual assault or sexual abuse?
+  Do you want to add another time ${other_parties[0].name.full(middle='full')} committed sexual assault or sexual abuse?
 subquestion: |
   You can enter up to 7 incidents in total.
   
@@ -885,9 +909,9 @@ question: |
 subquestion: |
   There are two kinds of Civil No Contact Orders: Emergency and Plenary. You can ask the court for both if you want.
   
-  An Emergency Order is an order which takes effect immediately. The order can be issued even before your abuser knows that you have filed a petition. However, the order only lasts 21 days, or until a formal court hearing where the abuser can present a case to the court also. 
+  An Emergency Order is an order which takes effect immediately. The order can be issued even before your perpetrator knows that you have filed a petition. However, the order only lasts 21 days, or until a formal court hearing where the perpetrator can present a case to the court also. 
   
-  A Plenary Order, is an order issued after a hearing at which the abuser can also present a case. This order can last a long time, usually two years.
+  A Plenary Order, is an order issued after a hearing at which the perpetrator can also present a case. This order can last a long time, usually two years.
 fields:
   - no label: order_type
     datatype: checkboxes
@@ -920,7 +944,7 @@ fields:
         show if: trial_court_index == -1
       - "Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people": no_contact
         show if: trial_court_index == -1
-      - "Stay away from the locations of the victim, victim's family and household member's work or school": away_places
+      - "Stay away from the locations of the survivor, survivor's family and household member's work or school": away_places
         show if: trial_court_index == -1
       - "Stay away from my pets and property": away_property
         show if: trial_court_index == -1
@@ -928,7 +952,7 @@ fields:
         show if: trial_court_index != -1
       - "Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people": no_contact
         show if: trial_court_index != -1
-      - "Stay away from the locations of the victim, victim's family and household member's home, work, school, or daycare": away_places
+      - "Stay away from the locations of the survivor, survivor's family and household member's home, work, school, or daycare": away_places
         show if: trial_court_index != -1
   - In feet, how far away should ${other_parties[0].name.full(middle='full')} stay?: distance_state
     datatype: integer
@@ -965,7 +989,7 @@ subject: |
 content: |
   **Stay Away**: to refrain from both physical presence and nonphysical contact with the Petitioner directly, indirectly, or through third parties who may or may not know of the order. "Nonphysical contact" includes, but is not limited to, telephone calls, mail, e-mail, fax, and written notes.
 
-  **Contact**: includes any contact with the victim, that is initiated or continued without the victim’s consent, or that is in disregard of the victim’s expressed desire that the contact be avoided or discontinued, including but not limited to being in the physical presence of the victim; appearing within the sight of the victim; approaching or confronting the victim in a public place or on private property; appearing at the workplace or residence of the victim; entering onto or remaining on property owned, leased, or occupied by the victim; or placing an object on, or delivering an object to, property owned, leased, or occupied by the victim.
+  **Contact**: includes any contact with the survivor, that is initiated or continued without the survivor’s consent, or that is in disregard of the survivor’s expressed desire that the contact be avoided or discontinued, including but not limited to being in the physical presence of the survivor; appearing within the sight of the survivor; approaching or confronting the survivor in a public place or on private property; appearing at the workplace or residence of the survivor; entering onto or remaining on property owned, leased, or occupied by the survivor; or placing an object on, or delivering an object to, property owned, leased, or occupied by the survivor.
 ---
 id: protected place types
 question: |
@@ -1089,7 +1113,7 @@ fields:
     default: IL      
   - ZIP code: protected_day_care.zip
 ---
-id: school with abuser
+id: school with perpetrator
 question: |
   Do you and ${other_parties[0].name.full(middle='full')} go to the same school?
 fields:
@@ -1132,7 +1156,7 @@ fields:
     js show if: |
         val("prohibit_school") === true && val("which_school") === "other_school"
 ---
-id: abuser anything else
+id: perpetrator anything else
 question: |
   Do you want the court to make ${other_parties[0].name.full(middle='full')} to do or stop doing anything else?
 fields: 
@@ -1243,7 +1267,7 @@ subquestion: |
   
   [NEWLINE]
 ---
-id: abuser gender cook
+id: perpetrator gender cook
 question: |
   What is ${other_parties[0].name.full(middle="full")}'s sex and gender identity?
 subquestion: |
@@ -1288,7 +1312,7 @@ fields:
       variable: other_parties[0].cook_gender['other']
       is: True
 ---
-id: abuser gender statewide
+id: perpetrator gender statewide
 question: |
   What gender is ${other_parties[0].name.full(middle='full')}?
 subquestion: |
@@ -1310,7 +1334,7 @@ fields:
       variable: other_parties[0].state_gender
       is: "Other"  
 ---
-id: abuser race abuser skin tone
+id: perpetrator race perpetrator skin tone
 question: |
   What race is ${other_parties[0].name.full(middle='full')}?
 subquestion: |
@@ -1340,7 +1364,7 @@ fields:
       variable: other_parties[0].race
       is: "Other"  
 ---
-id: abuser any other names
+id: perpetrator any other names
 question: |
   Has ${other_parties[0].name.full(middle='full')} gone by any other names?
 subquestion: |
@@ -1356,7 +1380,7 @@ fields:
     help: |
       This could be a name from an earlier marriage or a nickname. If there is more than one, separate by commas.
 ---
-id: abuser ssn
+id: perpetrator ssn
 question: |
   What are the last four digits of ${other_parties[0].name.full(middle='full')}'s Social Security Number?
 subquestion: |
@@ -1528,7 +1552,7 @@ fields:
       - Sometimes: Sometimes
       - No: No
 ---
-id: abuser notable features
+id: perpetrator notable features
 question: |
   What are ${other_parties[0].name.full(middle='full')}'s notable features?
 subquestion: |
@@ -1563,7 +1587,7 @@ fields:
     help: |
       The forms have space for about 150 characters including spaces.
 ---
-id: abuser in jail
+id: perpetrator in jail
 question: |
     Is ${other_parties[0].name.full(middle='full')} incarcerated?
 subquestion: |
@@ -1579,7 +1603,7 @@ fields:
     help: |
       If you do not know the name of the jail, you may leave this blank.
 ---
-id: abuser probation
+id: perpetrator probation
 question: |
   Is ${other_parties[0].name.full(middle="full")} on court-ordered probation?
 fields:
@@ -1598,7 +1622,7 @@ fields:
       variable: respondent_on_probation
       is: "Yes"
 ---
-id: abuser drivers license
+id: perpetrator drivers license
 question: |
   What is ${other_parties[0].name.full(middle='full')}'s driver's license number?
 subquestion: |
@@ -1608,14 +1632,14 @@ fields:
     required: False
     maxlength: 20
 ---
-id: abuser access to vehicle
+id: perpetrator access to vehicle
 question: |
   Does ${other_parties[0].name.full(middle='full')} have access to a vehicle?
 fields:
   - no label: other_parties[0].has_vehicle
     datatype: yesnomaybe
 ---
-id: abuser vehicle details
+id: perpetrator vehicle details
 question: |
   Enter as much information as you can about ${other_parties[0].name.full(middle='full')}'s vehicle.
 subquestion: |
@@ -1647,7 +1671,7 @@ fields:
     code: |
       states_list()
 ---
-id: abuser another number check
+id: perpetrator another number check
 question: |
   Do you know another number that can identify ${other_parties[0].name.full(middle='full')}?
 subquestion: |
@@ -1688,7 +1712,7 @@ fields:
       variable: respondent_on_social_media
       is: 'Yes'
 ---
-id: abuser phone number abuser email address
+id: perpetrator phone number perpetrator email address
 question: |
   What is ${other_parties[0].name.full(middle='full')}'s contact information?
 subquestion: |
@@ -1707,7 +1731,7 @@ fields:
     datatype: email
     required: False
 ---
-id: abuser any additional contact info
+id: perpetrator any additional contact info
 question: |
   Does ${other_parties[0].name.full(middle='full')} have another phone number or email address?
 subquestion: |
@@ -1730,7 +1754,7 @@ fields:
   - no label: other_parties[0].bonus_contact_info
     datatype: yesnoradio
 ---
-id: abuser alt email phone
+id: perpetrator alt email phone
 question: |
   What is ${other_parties[0].name.full(middle='full')}'s additional contact information?
 subquestion: |
@@ -1757,14 +1781,14 @@ fields:
     datatype: email
     required: False
 ---
-id: abuser address known
+id: perpetrator address known
 question: |
   Do you know ${other_parties[0].name.full(middle='full')}'s current home address?
 fields:
   - no label: other_parties[0].address_known
     datatype: yesnoradio
 ---
-id: abuser last known address
+id: perpetrator last known address
 question: |
   Do you know ${other_parties[0].name.full(middle="full")}'s last known address?
 fields:
@@ -1780,7 +1804,7 @@ subquestion: |
   
   You can do this by filing a written statement called an “affidavit” telling how you tried to find ${other_parties[0].name.full(middle='full')}'s address. If you need to file one of these, the judge or court clerk should provide it.
 ---
-id: abuser current address
+id: perpetrator current address
 question: |
   % if other_parties[0].address_known:
   What is ${other_parties[0].name.full(middle='full')}'s current home address?
@@ -1799,7 +1823,7 @@ fields:
     default: IL      
   - ZIP code: other_parties[0].address.zip
 ---
-id: abuser currently employed
+id: perpetrator currently employed
 question: |
   Do you know if ${other_parties[0].name.full(middle='full')} is employed?
 fields:
@@ -1807,7 +1831,7 @@ fields:
     datatype: yesnoradio
 ---
 #what if they have more than one employer?
-id: abuser employer
+id: perpetrator employer
 question: |
   Enter as much information as you can about ${other_parties[0].name.full(middle='full')}'s employer.
 subquestion: |
@@ -1996,7 +2020,7 @@ code: |
   if other_ops.number_gathered() >= 2:
     other_ops.there_is_another = False
 ---
-id: abuser any order of protection
+id: perpetrator any order of protection
 question: |
   Other protective orders
 subquestion: |
@@ -2121,11 +2145,11 @@ code: |
     service_list.append({ "employer_address": other_parties[0].name.full(middle="full")+ "'s work address (" + other_parties[0].employer_address.on_one_line(bare=True) + ")" })
   service_list.append({ "add_service_address": "An address I will enter" })
 ---
-id: abuser which address
+id: perpetrator which address
 question: |
   Where should court papers be delivered to ${other_parties[0].name.full(middle='full')}?
 subquestion: |
-  The court will need an address where they can deliver the court forms to ${other_parties[0].name.full(middle='full')}. If necessary, you could try an Internet search to find one. You can ask for an cnco without knowing their address, but that may make it harder to get the cnco.
+  The court will need an address where they can deliver the court forms to ${other_parties[0].name.full(middle='full')}. If necessary, you could try an Internet search to find one. You can ask for a CNCO without knowing their address, but that may make it harder to get the cnco.
 fields: 
   - no label: other_parties[0].which_address
     input type: radio
@@ -3572,7 +3596,7 @@ review:
     show if: users[0].has_email_address
   - Edit: other_parties[0].name.first
     button: |  
-      **Abuser's name:**
+      **perpetrator's name:**
       ${other_parties[0].name.full(middle='full')}
   - Edit: hide_address
     button: |
@@ -3642,7 +3666,7 @@ review:
       * They are the family or household member of someone sexually assaulted or sexually abused by ${other_parties[0].name.full(middle='full')}.
       % endif
       % if x.why_include['crisis_center']:
-      * They work for a rape crisis center providing services to a victim of ${other_parties[0].name.full(middle='full')}.
+      * They work for a rape crisis center providing services to a survivor of ${other_parties[0].name.full(middle='full')}.
       % endif
       % if x.why_include.all_false():
       No applicable reason
@@ -3672,7 +3696,7 @@ subquestion: |
 review:
   - Edit: other_parties[0].name.first
     button: |  
-      **Abuser's name:**
+      **perpetrator's name:**
       ${other_parties[0].name.full(middle='full')}
   - Edit: other_parties[0].state_gender
     button: |
@@ -4214,7 +4238,7 @@ review:
       * Stop contacting me and others whether in person, by phone, by e-mail, by note, or by sending messages through other people
       % endif
       % if protection_requested['away_places']:
-      * Stay away from the locations of the victim, victim's family and household member's work or school
+      * Stay away from the locations of the survivor, survivor's family and household member's work or school
       % endif
       % if protection_requested['away_property']:
       * Stay away from my pets and property
@@ -4231,7 +4255,7 @@ review:
       * Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people
       % endif
       % if protection_requested['away_places']:
-      * Stay away from the locations of the victim, victim's family and household member's home, work, school, or daycare
+      * Stay away from the locations of the survivor, survivor's family and household member's home, work, school, or daycare
       % endif  
     show if: trial_court_index != -1
   - Edit: distance_state
@@ -4538,7 +4562,7 @@ review:
     show if: users[0].has_email_address
   - Edit: other_parties[0].name.first
     button: |  
-      **Abuser's name:**
+      **perpetrator's name:**
       ${other_parties[0].name.full(middle='full')}
   - Edit: hide_address
     button: |
@@ -4616,7 +4640,7 @@ review:
       * Stop contacting me and others whether in person, by phone, by e-mail, by note, or by sending messages through other people
       % endif
       % if protection_requested['away_places']:
-      * Stay away from the locations of the victim, victim's family and household member's work or school
+      * Stay away from the locations of the survivor, survivor's family and household member's work or school
       % endif
       % if protection_requested['away_property']:
       * Stay away from my pets and property
@@ -4633,7 +4657,7 @@ review:
       * Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people
       % endif
       % if protection_requested['away_places']:
-      * Stay away from the locations of the victim, victim's family and household member's home, work, school, or daycare
+      * Stay away from the locations of the survivor, survivor's family and household member's home, work, school, or daycare
       % endif  
     show if: trial_court_index != -1
   - Edit: distance_state
@@ -4752,7 +4776,7 @@ review:
       <h4>Person you want protection from</h4>
   - Edit: other_parties[0].name.first
     button: |  
-      **Abuser's name:**
+      **perpetrator's name:**
       ${other_parties[0].name.full(middle='full')}
   - Edit: other_parties[0].state_gender
     button: |
