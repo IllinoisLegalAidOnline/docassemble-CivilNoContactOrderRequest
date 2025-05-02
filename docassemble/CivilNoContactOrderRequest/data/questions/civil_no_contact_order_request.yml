@@ -1,5 +1,5 @@
 metadata:
-  title: Sexual assault Civil No Contact Order
+  title: Civil No Contact Order
   short title: Civil No Contact Order
   comment: This program helps you ask the court to order someone abusing you to leave you alone. You can ask for a CNCO if you are a victim of rape, sexual assault, or sexual abuse.
   authors:
@@ -301,9 +301,9 @@ code: |
 ---
 id: welcome
 question: |
-  Sexual assault Civil No Contact Order
+  Civil No Contact Order
 subquestion: |
-  Welcome to Illinois Legal Aid Online's **Sexual assault Civil No Contact Order** Easy Form.
+  Welcome to Illinois Legal Aid Online's **Civil No Contact Order** Easy Form.
 
   This program will help you make forms to ask for a Civil No Contact Order (CNCO) against someone who has abused you. You can ask for a CNCO if you are a survivor of rape, sexual assault, or sexual abuse. The forms you make with this program can only be used in Illinois.
 
