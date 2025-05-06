@@ -3596,7 +3596,7 @@ review:
     show if: users[0].has_email_address
   - Edit: other_parties[0].name.first
     button: |  
-      **perpetrator's name:**
+      **Perpetrator's name:**
       ${other_parties[0].name.full(middle='full')}
   - Edit: hide_address
     button: |
@@ -3696,7 +3696,7 @@ subquestion: |
 review:
   - Edit: other_parties[0].name.first
     button: |  
-      **perpetrator's name:**
+      **Perpetrator's name:**
       ${other_parties[0].name.full(middle='full')}
   - Edit: other_parties[0].state_gender
     button: |
@@ -4562,7 +4562,7 @@ review:
     show if: users[0].has_email_address
   - Edit: other_parties[0].name.first
     button: |  
-      **perpetrator's name:**
+      **Perpetrator's name:**
       ${other_parties[0].name.full(middle='full')}
   - Edit: hide_address
     button: |
@@ -4776,7 +4776,7 @@ review:
       <h4>Person you want protection from</h4>
   - Edit: other_parties[0].name.first
     button: |  
-      **perpetrator's name:**
+      **Perpetrator's name:**
       ${other_parties[0].name.full(middle='full')}
   - Edit: other_parties[0].state_gender
     button: |
