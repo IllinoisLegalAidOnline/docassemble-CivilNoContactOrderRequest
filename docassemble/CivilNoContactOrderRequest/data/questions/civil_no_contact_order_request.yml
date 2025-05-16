@@ -92,6 +92,8 @@ code: |
   hide_address
   users[0].address.address
   other_parties[0].name.first
+  if not user_relationship['unrelated']:
+    related_note
   set_progress(20)
   
   if protect_whom["minor"] or protect_whom["adult"]:
@@ -581,6 +583,41 @@ subquestion: |
 fields:
   - code: |
       other_parties[0].name_fields()
+---
+id: relationship
+question: |
+  How are you related to ${other_parties[0].name.full(middle='full')}?
+fields:
+  - Relationship: user_relationship
+    datatype: checkboxes
+    none of the above: False
+    choices:
+      - We are not related.: unrelated
+      - We dated.: dated
+      - We are related through current or past marriage. For example, I am their spouse, ex-spouse, in-law, step-child, or other relative.: marriage
+      - We have children together.: children
+      - We are related through blood. For example, I am their parent, child, sibling, grandchild, grantparent, or other blood relative.: blood   
+      - We have a blood relationship through a child. For example, I am their niece's parent.: blood_child
+      - We share or have shared a home.: home
+      - We have a family or household relationship through a child I am the adoptive parent, legal guardian, or custodian of.: adopt_child
+      - They are my personal caregiver.: caregiver
+validation code: |
+    if user_relationship['unrelated']:
+      if user_relationship['dated'] or user_relationship['marriage'] or user_relationship['children'] or user_relationship['blood'] or user_relationship['blood_child'] or user_relationship['adopt_child'] or user_relationship['caregiver']:
+        validation_error("If you have any of the listed relationships with the person you are filing against, you should not select the 'We are not related.'")
+---
+id: related note
+continue button field: related_note
+question: |
+  Order of Protection
+subquestion: |
+  If the person stalking you is family member, household member, boyfriend, girlfriend, or ex, you may want to apply for an Order of Protection instead of a CNCO. An Order of Protection can help with more issues and may be easier to get.
+  
+  ILAO's article on [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) can help you find the protective order for your situation.
+  
+  If you would like to file an Order of Protection, you can use ILAO's [**Order of protection Easy Form**](https://www.illinoislegalaid.org/legal-information/order-protection). If you would like to file a Civil No Contact Order, you can use ILAO's [**Civil no contact order request Easy Form**](https://www.illinoislegalaid.org/legal-information/civil-no-contact-order-request).
+
+  If you would still like to make a CNCO, you can click **Next.**
 ---
 id: hide address
 question: |
