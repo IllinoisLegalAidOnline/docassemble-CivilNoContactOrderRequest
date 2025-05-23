@@ -1,7 +1,7 @@
 metadata:
   title: Civil No Contact Order
   short title: Civil No Contact Order
-  comment: This program helps you ask the court to order someone abusing you to leave you alone. You can ask for a CNCO if you are a victim of rape, sexual assault, or sexual abuse.
+  comment: This program helps you ask the court to order someone abusing you to leave you alone. You can ask for a CNCO if you are a victim of sexual assault, or sexual abuse.
   authors:
     - Vivian McNaughton
     - Matt Newsted
@@ -26,7 +26,7 @@ objects:
   - abusive_acts: DAList.using(object_type=Thing, there_are_any=True, complete_attribute='complete')
   - home: ALAddress
   - report_numbers: DAList.using(object_type=Thing, there_are_any=False)
-  - others_with_minor_initials: ALPeopleList.using(there_are_any=False)
+  #- others_with_minor_initials: ALPeopleList.using(there_are_any=False)
   - away_address_list: DAList.using(object_type=ALAddress, there_are_any=False)
   - no_remain_address_list: DAList.using(object_type=ALAddress, there_are_any=False)
   - school_list: DAList.using(object_type=ALAddress, there_are_any=False)
@@ -82,6 +82,9 @@ code: |
   
   nav.set_section('section_petitioner')
   protect_whom
+  if protect_whom['me']:
+    if user_military and has_military_order:
+      military_order_note
   trial_court_index
   if jurisdiction_type.all_false():
     other_jurisdiction_location
@@ -96,7 +99,8 @@ code: |
     related_note
   set_progress(20)
   
-  if protect_whom["minor"] or protect_whom["adult"]:
+  protect_whom_sets_there_are_any
+  if others_protected.there_are_any:
     others_protected.gather()
     pop_protected_code
 
@@ -109,8 +113,10 @@ code: |
     abuse_type
     
   nav.set_section('section_protections')
-  if order_type['emergency'] and trial_court_index == -1:
-    emergency_reason
+  order_type
+  #May need to add emergency reason back in after AOIC redesigns forms.
+  #if order_type['emergency'] and trial_court_index == -1:
+  #  emergency_reason
   if protection_requested['away_places']:
     if protected_place_types['Home']:
       run_home_address_block
@@ -244,20 +250,23 @@ code: |
 #others protected gather code block
 code: |
   others_protected[i].name.first
+  if others_protected[i].why_include['military']:
+    others_protected[i].military_order
   if others_protected[i].why_include.all_false():
     others_protected[i].cannot_include
   else:
     others_protected[i].birthdate
-    if hide_address:
-      others_protected[i].use_safe_address
-    if hide_address == False or others_protected[i].use_safe_address == False:
-      others_protected[i].address.address
+    if trial_court_index != -1:
+      if hide_address:
+        others_protected[i].use_safe_address
+      if hide_address == False or others_protected[i].use_safe_address == False:
+        others_protected[i].address.address
   others_protected[i].complete = True
 ---
 reconsider: True
 code: |
   popping_index = 0
-  if (protect_whom["minor"] or protect_whom["adult"]):
+  if others_protected.there_are_any:
     while (popping_index < others_protected.number_gathered()) and (others_protected.number_gathered() > 0):
       if others_protected[popping_index].why_include.all_false():
         others_protected[popping_index].cannot_include
@@ -307,7 +316,7 @@ question: |
 subquestion: |
   Welcome to Illinois Legal Aid Online's **Civil No Contact Order** Easy Form.
 
-  This program will help you make forms to ask for a Civil No Contact Order (CNCO) against someone who has abused you. You can ask for a CNCO if you are a survivor of rape, sexual assault, or sexual abuse. The forms you make with this program can only be used in Illinois.
+  This program will help you make forms to ask for a Civil No Contact Order (CNCO) against someone who has sexually abused or assaulted you. You can ask for a CNCO if you are a survivor of sexual assault, or sexual abuse. The forms you make with this program can only be used in Illinois.
 
   If the survivor of abuse is not you, but a child or an adult who is not capable of filing a petition, you may file a petition on behalf of the survivor.
 
@@ -328,7 +337,7 @@ subquestion: |
   To use this program:
 
   * You must be the survivor of sexual assault or sexual abuse, and
-  * You must file your forms in the county were the abuse took place or in the county where you, the perpetrator, or someone you want to protect live.
+  * You must file your forms in the county were the abuse took place or in the county where you, the perpetrator, or someone you are filing for live.
   
   To complete this program you will need to know:
   
@@ -353,11 +362,11 @@ continue button field: cnco_explainer
 question: |
   About Civil No Contact Orders
 subquestion: |
-  A Civil No Contact Order (CNCO) is a protective order protects survivors of rape, sexual assault, or sexual abuse from the perpetrator. The Order can also be used to protect the survivor's family and rape crisis center workers. 
+  A Civil No Contact Order (CNCO) is a protective order protects survivors of sexual assault, or sexual abuse from the perpetrator. The Order can also be used to protect the survivor's family and rape crisis center workers. 
 
   If you want to know what type of protective order is best for you, use ILAO's [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) tool to learn more.
 
-  With a CNCO, the court can make the perpetrator:
+  With a CNCO, the court can tell the perpetrator to:
 
   * Stay away from the survivor,
   * Stop contacting the survivor through telephone, computer, email, texts, mail, instant message, social media, or other people,
@@ -372,7 +381,7 @@ question: |
 subquestion: |
   This program will ask questions about sexual assault and sexual abuse. Answering these questions may be upsetting. If you become emotionally overwhelmed, please take a break from the program.  If you are using your ILAO Easy Forms account, you can continue your progress later.
 
-  When the court hears your request for a CNCO, you may need to talk in court about these topics. What you say will be in the court's records, but these records may be sealed.
+  When the court hears your request for a CNCO, you may need to talk in court about these topics. What you say will be in the court's records.
 ---
 id: first response note
 continue button field: first_response_note
@@ -396,16 +405,24 @@ fields:
   - no label: experienced_abuse
     datatype: yesnoradio
 ---
+# old text:
+# * Non-consensual sexual conduct, which includes as any intentional touching or contact with a person’s sexual organs, anus, or breast, or
+#  *Non-consenual sexual penetration, which includes any contact between the sex organ or anus of one person with the other person’s sex organ, mouth, or anus. It also includes any insertion of any part of a person’s body or object into the sex organ or anus of the other.
 template: assault_conduct_define
 subject: |
   **Definitions of sexual assault and non-consensual sexual conduct**
 content: |
-  In Illinois, sexual assault occurs when a person engages in:
+  In Illinois, **sexual assault** occurs when a person does non-consensual sexual conduct or non-consensual sexual penetration.
 
-  * Non-consensual sexual conduct, which includes as any intentional touching or contact with a person’s sexual organs, anus, or breast, or
-  *Non-consenual sexual penetration, which includes any contact between the sex organ or anus of one person with the other person’s sex organ, mouth, or anus. It also includes any insertion of any part of a person’s body or object into the sex organ or anus of the other.
+  **Sexual conduct** can be:
+
+  * Touching or fondling someone's genitalia, anus, or breast over or under clothes,
+  * Touching or fondling any part of the body of a child under the age of 13 for the purpose of sexual gratification, or
+  * Transferring or transmitting semen on any part of a clothed or unclothed body.
+
+  **Sexual penetration** is the putting of a body part, object, or animal into someone's genitalia, anus, or mouth.
   
-  Non-consensual conduct means it is done without the consent of both people, and it includes situations where:
+  Conduct is **non-consensual** when it is done without the consent of both people, and it includes situations where:
   
   * The perpetrator uses force or threatens to use force against the survivor,
   * The perpetrator knows that the survivor is unable to understand what is happening or cannot give informed consent,
@@ -424,6 +441,24 @@ buttons:
   - Exit: exit
   - Restart: restart
 ---
+id: petitioner military order check
+question: |
+  Are you a service member of the Illinois National Guard or another reserve military component serving in Illinois?
+fields:
+  - no label: user_military
+    datatype: yesnoradio
+  - Do you have a Military Protective Order against the perpetrator?: has_military_order
+    datatype: yesnoradio
+    js show if:
+      val('user_military') === true
+---
+id: military order note
+continue button field: military_order_note
+question: |
+  Your Military Protective Order
+subquestion: |
+  You should to bring a copy of your Military Protective Order to your hearing.
+---
 id: in illinois
 question: |
   Do you want to file for a Civil No Contact Order in Illinois?
@@ -431,7 +466,7 @@ subquestion: |
   You can file in Illinois if:
 
   * You live in Illinois,
-  * Someone you want to protect lives in Illinois,
+  * You are filing on behalf of someone who lives in Illinois,
   * The person you are filing against lives in Illinois, or
   * The assault or abuse took place in Illinois.
 fields:
@@ -548,14 +583,14 @@ validation code: |
   if protect_whom.all_false():
     validation_error("You need to pick someone to protect.")
 ---
-depends on:
-  - protect_whom["minor"]
-  - protect_whom["adult"]
-code: |
-  if protect_whom['minor'] or protect_whom['adult']:
-    others_protected.there_are_any = True 
-  else:
-    others_protected.there_are_any = False
+#depends on:
+#  - protect_whom["minor"]
+#  - protect_whom["adult"]
+#code: |
+#  if protect_whom['minor'] or protect_whom['adult']:
+#    others_protected.there_are_any = True 
+#  else:
+#    others_protected.there_are_any = False
 ---
 id: petitioner name
 sets:
@@ -611,19 +646,20 @@ continue button field: related_note
 question: |
   Order of Protection
 subquestion: |
-  If the perpetrator of the abuse is family member, household member, boyfriend, girlfriend, or ex, you may want to apply for an Order of Protection instead of a CNCO. An Order of Protection can help with more issues and may be easier to get.
+  If the **{perpetrator}** of the abuse is family member, household member, boyfriend, girlfriend, or ex, you may want to apply for an Order of Protection instead of a CNCO. An Order of Protection can help with more issues and may be easier to get.
   
-  ILAO's article on [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) can help you find the protective order for your situation.
+  Use ILAO's [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) tool to help you find the protective order for your situation.
   
-  If you would like to file an Order of Protection, you can use ILAO's [**Order of protection Easy Form**](https://www.illinoislegalaid.org/legal-information/order-protection). If you would like to file a Civil No Contact Order, you can use ILAO's [**Civil no contact order request Easy Form**](https://www.illinoislegalaid.org/legal-information/civil-no-contact-order-request).
-
-  If you would still like to make a CNCO, you can click **Next.**
+  If you would like to make a CNCO, click **Next.** Otherwise, if you would like to file an Order of Protection, you can use ILAO's [**Order of protection Easy Form**](https://www.illinoislegalaid.org/legal-information/order-protection). 
+terms:
+  - "perpetrator":
+      The perpetrator is the person who did the abusive, harmful, or threatening behavior.
 ---
 id: hide address
 question: |
   Do you want to keep your home address hidden?
 subquestion: |
-  You do not have to include your home address if disclosing it would risk you or someone in your family or household being abused. If you do not include your home address, you will need to enter a mailing address where you can receive court notices.
+  You do not have to include your home address if disclosing it would risk you or someone in your family or household being abused or assaulted. If you do not include your home address, you will need to enter a mailing address where you can receive court notices.
 field: hide_address
 choices:
   - Yes: True
@@ -647,11 +683,13 @@ question: |
 subquestion: |
   So far you have told us about ${others_protected.full_names()}.
 
-  This is who else you can protect with this order:
+  You can protect someone with this order if:
   
-  * Someone who was sexually assaulted or sexually abused by ${other_parties[0].name.full(middle='full')},
-  * A family or household member, or
-  * A worker for a rape crisis center.
+  * They were sexually assaulted or sexually abused by ${other_parties[0].name.full(middle='full')},
+  * They are your family or household member,
+  * They are the family or household member of someone sexually assaulted or sexually abused by ${other_parties[0].name.full(middle='full')},
+  * They are a member of the Illinois National Guard or another reserve military component who has received a Military Protective Order, or
+  * They work for a rape crisis center providing services to a survivor of ${other_parties[0].name.full(middle='full')}.
 fields:
   - no label: others_protected.there_is_another
     datatype: yesnoradio
@@ -803,6 +841,36 @@ fields:
     datatype: BirthDate
     alMax: today()
 ---
+on change: 
+  protect_whom['minor']: |
+    undefine('protect_whom_sets_there_are_any')
+    if others_protected.number_gathered() == 0:
+      undefine('others_protected.there_are_any')
+  protect_whom['adult']: |
+    undefine('protect_whom_sets_there_are_any')
+    if others_protected.number_gathered() == 0:
+      undefine('others_protected.there_are_any')
+---
+code: |
+  if protect_whom['minor'] or protect_whom['adult']:
+    others_protected.there_are_any = True
+  protect_whom_sets_there_are_any = True
+---
+id: others protected there are any
+question: |
+  Do you want the CNCO to protect anyone else?
+subquestion: |
+  You can list someone as a protected person if:
+
+  * They were sexually assaulted or sexually abused by ${other_parties[0].name.full(middle='full')},
+  * They are your family or household member,
+  * They are the family or household member of someone sexually assaulted or sexually abused by ${other_parties[0].name.full(middle='full')},
+  * They are a member of the Illinois National Guard or another reserve military component who has received a Military Protective Order, or
+  * They work for a rape crisis center providing services to a survivor of ${other_parties[0].name.full(middle='full')}.
+fields:
+  - no label: others_protected.there_are_any
+    datatype: yesnoradio
+---
 id: why include
 question: |
   Why do you want the CNCO to protect ${others_protected[i].name.full(middle='full')}?
@@ -812,10 +880,18 @@ fields:
     choices:
       - They were sexually assaulted or sexually abused by ${other_parties[0].name.full(middle='full')}.: victim
       - They are my family or household member.: petitioner_household
-        show if: protect_whom['me']
+        #show if: protect_whom['me']
       - They are the family or household member of someone sexually assaulted or sexually abused by ${other_parties[0].name.full(middle='full')}.: other_household
-        show if: protect_whom['minor'] or protect_whom['adult']
+        #show if: protect_whom['minor'] or protect_whom['adult']
+      - They are a member of the Illinois National Guard or another reserve military component who has received a Military Protective Order.: military
       - They work for a rape crisis center providing services to a survivor of ${other_parties[0].name.full(middle='full')}.: crisis_center
+---
+id: include military order
+continue button field: others_protected[i].military_order
+question: |
+  ${others_protected[i].name.full(middle='full')}'s Military Protective Order
+subquestion: |
+  You should to bring a copy of ${others_protected[i].name.full(middle='full')}'s Military Protective Order to your hearing.
 ---
 id: cannot include
 continue button field: others_protected[i].cannot_include
@@ -831,7 +907,7 @@ continue button field: abusive_acts_intro
 question: |
   Reasons for the Civil No Contact Order
 subquestion: |
-  The following questions will ask about times when ${other_parties[0].name.full(middle='full')} did sexual assault or sexual abuse.
+  The following questions will ask about the sexual assault or sexual abuse done by ${other_parties[0].name.full(middle='full')}.
   
   You should be specific. Tell when and where each event happened, and how it affected you.
   
@@ -870,7 +946,7 @@ fields:
     required: False
     maxlength: 15
     help: |
-      If you don't remember the exact time, you can enter an estimate or leave this blank.
+      If you don't remember the exact time, you can enter an estimate, a general time such as "morning" or "late afternoon," or leave this blank.
   - Location: abusive_acts[i].place
     maxlength: 50
     help: |
@@ -949,6 +1025,8 @@ subquestion: |
   An Emergency Order is an order which takes effect immediately. The order can be issued even before your perpetrator knows that you have filed a petition. However, the order only lasts 21 days, or until a formal court hearing where the perpetrator can present a case to the court also. 
   
   A Plenary Order, is an order issued after a hearing at which the perpetrator can also present a case. This order can last a long time, usually two years.
+
+  If you want to be protected before you are able to ask for a long-term order, you can choose both an emergency order and a plenary order.
 fields:
   - no label: order_type
     datatype: checkboxes
@@ -969,7 +1047,7 @@ fields:
 ---
 id: protection requested
 question: |
-  What do you want the court to make ${other_parties[0].name.full(middle='full')} to do?
+  What do you want the court to tell ${other_parties[0].name.full(middle='full')} to do?
 subquestion: |
   ${collapse_template(stay_away_contact)}
 fields:
@@ -981,7 +1059,7 @@ fields:
         show if: trial_court_index == -1
       - "Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people": no_contact
         show if: trial_court_index == -1
-      - "Stay away from the locations of the survivor, survivor's family and household member's work or school": away_places
+      - "Stay away from the locations of the survivor, survivor's family or household member's work or school": away_places
         show if: trial_court_index == -1
       - "Stay away from my pets and property": away_property
         show if: trial_court_index == -1
@@ -994,6 +1072,8 @@ fields:
   - In feet, how far away should ${other_parties[0].name.full(middle='full')} stay?: distance_state
     datatype: integer
     max: 999
+    help: |
+      For reference, one city block is around 300 to 400 feet.
     show if: 
       code: |
         trial_court_index != -1
@@ -1002,6 +1082,8 @@ fields:
   - In feet, how far away should ${other_parties[0].name.full(middle='full')} stay from you and others?: distance_people
     datatype: integer
     max: 999
+    help: |
+      For reference, one city block is around 300 to 400 feet.
     show if: 
       code: |
         trial_court_index == -1  
@@ -1010,6 +1092,8 @@ fields:
   - In feet, how far away should ${other_parties[0].name.full(middle='full')} stay from the locations?: distance_places
     datatype: integer
     max: 999
+    help: |
+      For reference, one city block is around 300 to 400 feet.
     show if: 
       code: |
         trial_court_index == -1  
@@ -1279,7 +1363,7 @@ reconsider: True
 code: |
   minors_protected.clear()
   adults_protected.clear()
-  if (protect_whom["minor"] or protect_whom["adult"]):
+  if others_protected.there_are_any:
     for other in others_protected:
       if other.age_in_years() < 18:
         minors_protected.append(other)
@@ -2283,7 +2367,7 @@ reconsider: True
 code: |
   any_minors = False
   any_adults = False
-  if (protect_whom["minor"] or protect_whom["adult"]):
+  if others_protected.there_are_any:
     if others_protected.number_gathered() > 0:
       for other in others_protected:
         if other.age_in_years() < 18:
@@ -2355,7 +2439,7 @@ fields:
   - no label: jurisdiction_type
     datatype: checkboxes
     choices:
-      - I or the person I want to protect lives in ${ trial_court.address.county } County.: I live here
+      - I or the person I am filing for lives in ${ trial_court.address.county } County.: I live here
       - The person I am filing against lives in ${ trial_court.address.county } County.: Respondent lives here
       - The abuse took place in ${ trial_court.address.county } County.: Abuse was here              
 ---
@@ -2372,7 +2456,7 @@ subquestion: |
 ---
 reconsider: True
 code: |
-  if (protect_whom["minor"] or protect_whom["adult"]):
+  if others_protected.there_are_any:
 
     for index, other in enumerate(others_protected):
       if trial_court_index == -1:
@@ -2506,7 +2590,7 @@ code: |
     else:
       emergency_order.enabled = False
       emergency_order_bundle.enabled = False
-    if (protect_whom["minor"] or protect_whom["adult"]):
+    if others_protected.there_are_any:
       if others_protected.number_gathered() > 2:
         others_protected_addendum.enabled = True
   
@@ -2528,9 +2612,9 @@ code: |
     else:
       cook_e_order.enabled = False
       emergency_order_bundle.enabled = False
-    if (protect_whom["minor"] or protect_whom["adult"]):
-      if others_protected.number_gathered() > 0:
-        others_protected_addendum.enabled = True
+    #if others_protected.there_are_any:
+    #  if others_protected.number_gathered() > 0:
+    #    others_protected_addendum.enabled = True
     
 ---
 attachment:
@@ -2544,7 +2628,7 @@ attachment:
     - "circuit_court": ${court_circuit.upper()}
     - "filing_county": ${trial_court.address.county.upper()}
     - "user_name": ${users[0].name.full(middle='full')}
-    - "others_protected": ${others_protected.full_names() if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "others_protected": ${others_protected.full_names() if others_protected.there_are_any else ""}
     - "protect_a_minor": ${any_minors}
     - "protect_an_adult": ${any_adults}
     - "independent": ${True}
@@ -2566,25 +2650,25 @@ attachment:
         % endif
     - "school_board_notice": ${prohibit_school if same_school else False}
     - "behalf_of_names": |
-        % if (protect_whom["minor"] or protect_whom["adult"]) and others_protected.number_gathered() > 0:
+        % if others_protected.there_are_any and others_protected.number_gathered() > 0:
         ${ others_protected.full_names()}
         % endif
     - "abuser_name": ${ other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
     - "user_address": ${users[0].address.on_one_line(bare=True)}
     - "use_safe_address": ${hide_address}
-    - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if others_protected.there_are_any else ""}
     - "other_protected_address_1": |
-        % if (protect_whom["minor"] or protect_whom["adult"]):
+        % if others_protected.there_are_any:
         % if hide_address and others_protected[0].use_safe_address:
         ${users[0].address.on_one_line(bare=True)}
         % else:
         ${others_protected[0].address.on_one_line(bare=True)}
         % endif
         % endif
-    - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if others_protected.there_are_any else ""}
     - "other_protected_address_2": |
-        % if (protect_whom["minor"] or protect_whom["adult"]):
+        % if others_protected.there_are_any:
         % if hide_address and others_protected[1].use_safe_address:
         ${users[0].address.on_one_line(bare=True)}
         % else:
@@ -2688,7 +2772,7 @@ attachment:
     - "school_daycare_addresses": ${comma_and_list(away_school_daycare_list)}
     - "respondent_prison": ${respondent_jail_name if respondent_jail_check else ""}
     - "others_addendum": |
-        % if (protect_whom["minor"] or protect_whom["adult"]) and others_protected.number_gathered() > 2:
+        % if others_protected.there_are_any and others_protected.number_gathered() > 2:
         A list of additional protected persons is attached.
         % endif
 ---
@@ -2706,7 +2790,7 @@ attachment:
     - "plenary_type": ${False}
     - "independent": ${True}
     - "user_name": ${users[0].name.full(middle='full')}
-    - "others_protected": ${others_protected.full_names() if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "others_protected": ${others_protected.full_names() if others_protected.there_are_any else ""}
     - "protect_a_minor": ${any_minors}
     - "protect_an_adult": ${any_adults}
     - "respondent_has_parents": |
@@ -2726,23 +2810,23 @@ attachment:
         ${parents_guardians.full_names()}
         % endif
     - "school_board_notice": ${prohibit_school if same_school else False}
-    - "behalf_of_names": ${ others_protected.full_names() if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "behalf_of_names": ${ others_protected.full_names() if others_protected.there_are_any else ""}
     - "abuser_name": ${ other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
     - "user_address": ${users[0].address.on_one_line(bare=True)}
     - "use_safe_address": ${hide_address}
-    - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if others_protected.there_are_any else ""}
     - "other_protected_address_1": |
-        % if (protect_whom["minor"] or protect_whom["adult"]):
+        % if others_protected.there_are_any:
         % if hide_address and others_protected[0].use_safe_address:
         ${users[0].address.on_one_line(bare=True)}
         % else:
         ${others_protected[0].address.on_one_line(bare=True)}
         % endif
         % endif
-    - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if others_protected.there_are_any else ""}
     - "other_protected_address_2": |
-        % if (protect_whom["minor"] or protect_whom["adult"]):
+        % if others_protected.there_are_any:
         % if hide_address and others_protected[1].use_safe_address:
         ${users[0].address.on_one_line(bare=True)}
         % else:
@@ -2812,7 +2896,7 @@ attachment:
     - "protected_school_day_care_addresses": ${comma_and_list(away_school_daycare_list)}
     - "respondent_prison": ${respondent_jail_name if respondent_jail_check else ""}
     - "others_addendum": |
-        % if (protect_whom["minor"] or protect_whom["adult"]) and others_protected.number_gathered() > 2:
+        % if others_protected.there_are_any and others_protected.number_gathered() > 2:
         A list of additional protected persons is attached.
         % endif
     - "minor_has_parents": |
@@ -2842,7 +2926,7 @@ attachment:
     - "plenary_type": ${True}
     - "independent": ${True}
     - "user_name": ${users[0].name.full(middle='full')}
-    - "others_protected": ${others_protected.full_names() if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "others_protected": ${others_protected.full_names() if others_protected.there_are_any else ""}
     - "protect_a_minor": ${any_minors}
     - "protect_an_adult": ${any_adults}
     - "respondent_has_parents": |
@@ -2862,23 +2946,23 @@ attachment:
         ${parents_guardians.full_names()}
         % endif
     - "school_board_notice": ${prohibit_school if same_school else False}
-    - "behalf_of_names": ${ others_protected.full_names() if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "behalf_of_names": ${ others_protected.full_names() if others_protected.there_are_any else ""}
     - "abuser_name": ${ other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
     - "user_address": ${users[0].address.on_one_line(bare=True)}
     - "use_safe_address": ${hide_address}
-    - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if others_protected.there_are_any else ""}
     - "other_protected_address_1": |
-        % if (protect_whom["minor"] or protect_whom["adult"]):
+        % if others_protected.there_are_any:
         % if hide_address and others_protected[0].use_safe_address:
         ${users[0].address.on_one_line(bare=True)}
         % else:
         ${others_protected[0].address.on_one_line(bare=True)}
         % endif
         % endif
-    - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "other_protected_name_2": ${others_protected[1].name.full(middle='full') if others_protected.there_are_any else ""}
     - "other_protected_address_2": |
-        % if (protect_whom["minor"] or protect_whom["adult"]):
+        % if others_protected.there_are_any:
         % if hide_address and others_protected[1].use_safe_address:
         ${users[0].address.on_one_line(bare=True)}
         % else:
@@ -2948,7 +3032,7 @@ attachment:
     - "protected_school_day_care_addresses": ${comma_and_list(away_school_daycare_list)}
     - "respondent_prison": ${respondent_jail_name if respondent_jail_check else ""}
     - "others_addendum": |
-        % if (protect_whom["minor"] or protect_whom["adult"]) and others_protected.number_gathered() > 2:
+        % if others_protected.there_are_any and others_protected.number_gathered() > 2:
         A list of additional protected persons is attached.
         % endif
     - "minor_has_parents": |
@@ -3061,13 +3145,19 @@ attachment:
   editable: False
   pdf template file: cook_cnco_petition.pdf
   fields:
-    - "on_behalf_of": ${users[0].name.full(middle='full')}
-    - "behalf_petitioner": |
-        % if (protect_whom["minor"] or protect_whom["adult"]):
-        % if others_protected.number_gathered() > 0:
-        ${others_protected.full_names()}
-        % endif
-        % endif
+    - "is_petition": ${True}
+    - "temp_petition": ${True}
+    - "is_petition_2": ${True}
+    - "temp_petition_2": ${True}
+    - "is_petition_3": ${True}
+    - "temp_petition_3": ${True}
+    - "behalf_petitioner": ${users[0].name.full(middle='full')}
+    #- "behalf_petitioner": |
+    #    % if others_protected.there_are_any:
+    #    % if others_protected.number_gathered() > 0:
+    #    ${others_protected.full_names()}
+    #    % endif
+    #    % endif
     - "respondent_1": ${other_parties[0].name.full(middle='full')}
     - "respondent_2": ${other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
@@ -3078,9 +3168,10 @@ attachment:
     - "plenary_check": ${order_type['plenary']}
     - "petitioner_name_1": ${users[0].name.full(middle='full')}
     - "petitioner_name_2": ${users[0].name.full(middle='full')}
-    - "child_name": ${child_list if (protect_whom["minor"] or protect_whom["adult"]) else ""}
-    - "adult_name": ${adult_list if (protect_whom["minor"] or protect_whom["adult"]) else ""}
+    - "child_name": ${child_list if others_protected.there_are_any else ""}
+    - "adult_name": ${adult_list if others_protected.there_are_any else ""}
     - "safe_address": ${hide_address}
+    - "address_is_residence": ${False if hide_address else True}
     - "petitioner_address": ${users[0].address.on_one_line(bare=True)}
     - "respondent_name": ${other_parties[0].name.full(middle='full')}
     - "respondent_address": ${other_parties[0].address.on_one_line(bare=True)}
@@ -3114,11 +3205,11 @@ attachment:
     - "no_police_report": ${ False if  abusive_acts[0].police_check else True}
     - "police_report_1": ${abusive_acts[0].police_number if abusive_acts[0].police_check else ""}
     - "others_protected_list": |     
-        % if (protect_whom["minor"] or protect_whom["adult"]) and not protect_whom['me']:
+        % if others_protected.there_are_any and not protect_whom['me']:
         ${others_protected.full_names()}
-        % elif protect_whom['me'] and not (protect_whom["minor"] or protect_whom["adult"]):
+        % elif protect_whom['me'] and not others_protected.there_are_any:
         ${users[0].name.full(middle='full')}
-        % elif (protect_whom["minor"] or protect_whom["adult"]) and protect_whom['me']:
+        % elif others_protected.there_are_any and protect_whom['me']:
         % if others_protected.number_gathered() == 1:
         ${users[0].name.full(middle='full')} and ${others_protected.full_names()}
         % elif others_protected.number_gathered() == 0:
@@ -3393,12 +3484,12 @@ attachment:
   pdf template file: cook_cnco_order.pdf
   fields:
     - "user_name": ${users[0].name.full(middle='full')}
-    - "additional_protected": |
-        % if protect_whom["minor"] or protect_whom["adult"]:
-        ${others_protected.full_names()}
-        % endif
+    #- "additional_protected": |
+    #    % if others_protected.there_are_any:
+    #    ${others_protected.full_names()}
+    #    % endif
     - "other_protected_parties": |
-        % if protect_whom["minor"] or protect_whom["adult"]:
+        % if others_protected.there_are_any:
         ${others_protected.full_names()}
         % endif
     - "respondent": ${other_parties[0].name.full(middle='full')}
@@ -3480,12 +3571,12 @@ attachment:
   pdf template file: cook_cnco_order.pdf
   fields:
     - "user_name": ${users[0].name.full(middle='full')}
-    - "additional_protected": |
-        % if protect_whom["minor"] or protect_whom["adult"]:
-        ${others_protected.full_names()}
-        % endif
+    #- "additional_protected": |
+    #    % if others_protected.there_are_any:
+    #    ${others_protected.full_names()}
+    #    % endif
     - "other_protected_parties": |
-        % if protect_whom["minor"] or protect_whom["adult"]:
+        % if others_protected.there_are_any:
         ${others_protected.full_names()}
         % endif
     - "respondent": ${other_parties[0].name.full(middle='full')}
@@ -3614,6 +3705,17 @@ review:
       % if protect_whom['adult']:
       * An adult who cannot file due to age, disablility or health
       % endif
+  - Edit: user_military
+    button: |
+        **Are you a service member of the Illinois National Guard or another reserve military component serving in Illinois?**
+        % if user_military and has_military_order:
+        Yes, and I have a Military Protective Order.
+        % elif user_military:
+        Yes, but I do not have a Military Protective Order.
+        % else:
+        No
+        % endif
+    show if: protect_whom['me']
   - Edit: users[0].name.first
     button: |
       **Your name:**
@@ -3651,6 +3753,11 @@ review:
     button: |
       **Your birth date:**
       ${users[0].birthdate}
+  - Edit: others_protected.there_are_any
+    button: |
+      **Do you want to protect anyone else with the CNCO?**
+      ${word(yesno(others_protected.there_are_any))}
+    show if: protect_whom['minor'] == False and protect_whom['adult'] == False
   - Edit: others_protected.revisit
     button: |
       **Others to protect: (Edit to change names, addresses, and other information)**
@@ -3658,7 +3765,7 @@ review:
       % for my_var in others_protected:
         * ${ my_var.name.full(middle="full") }
       % endfor
-    show if: (protect_whom["minor"] or protect_whom["adult"])
+    show if: others_protected.there_are_any
 ---
 id: others protected review screen
 continue button field: others_protected.revisit
@@ -3701,6 +3808,9 @@ review:
       % endif
       % if x.why_include['other_household']:
       * They are the family or household member of someone sexually assaulted or sexually abused by ${other_parties[0].name.full(middle='full')}.
+      % endif
+      % if x.why_include['military']:
+      * They are a member of the Illinois National Guard or another reserve military component who has received a Military Protective Order.
       % endif
       % if x.why_include['crisis_center']:
       * They work for a rape crisis center providing services to a survivor of ${other_parties[0].name.full(middle='full')}.
@@ -4479,7 +4589,7 @@ review:
       **You are filing in ${end_in_county(trial_court.address.county)} because:**
       
       % if jurisdiction_type['I live here']:
-      * I live in ${end_in_county(trial_court.address.county)}.
+      * I or someone I am filing for live in ${end_in_county(trial_court.address.county)}.
       % endif
       % if jurisdiction_type['Respondent lives here']:
       * The person I am filing against lives in ${end_in_county(trial_court.address.county)}.
@@ -4580,6 +4690,17 @@ review:
       % if protect_whom['adult']:
       * An adult who cannot file due to age, disablility or health
       % endif
+  - Edit: user_military
+    button: |
+        **Are you a service member of the Illinois National Guard or another reserve military component serving in Illinois?**
+        % if user_military and has_military_order:
+        Yes, and I have a Military Protective Order.
+        % elif user_military:
+        Yes, but I do not have a Military Protective Order.
+        % else:
+        No
+        % endif
+    show if: protect_whom['me']
   - Edit: users[0].name.first
     button: |
       **Your name:**
@@ -4617,6 +4738,11 @@ review:
     button: |
       **Your birth date:**
       ${users[0].birthdate}
+  - Edit: others_protected.there_are_any
+    button: |
+      **Do you want to protect anyone else with the CNCO?**
+      ${word(yesno(others_protected.there_are_any))}
+    show if: protect_whom['minor'] == False and protect_whom['adult'] == False
   - Edit: others_protected.revisit
     button: |
       **Others to protect: (Edit to change names, addresses, and other information)**
@@ -4624,7 +4750,7 @@ review:
       % for my_var in others_protected:
         * ${ my_var.name.full(middle="full") }
       % endfor
-    show if: (protect_whom["minor"] or protect_whom["adult"])
+    show if: others_protected.there_are_any
   - note: |
       <h4>What happened</h4>
   - Edit: abusive_acts.revisit
@@ -5251,7 +5377,7 @@ review:
       **You are filing in ${end_in_county(trial_court.address.county)} because:**
       
       % if jurisdiction_type['I live here']:
-      * I live in ${end_in_county(trial_court.address.county)}.
+      * I or someone I am filing for live in ${end_in_county(trial_court.address.county)}.
       % endif
       % if jurisdiction_type['Respondent lives here']:
       * The person I am filing against lives in ${end_in_county(trial_court.address.county)}.
