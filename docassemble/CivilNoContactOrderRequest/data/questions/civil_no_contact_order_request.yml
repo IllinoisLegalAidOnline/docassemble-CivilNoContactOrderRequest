@@ -53,6 +53,7 @@ code: |
 # Road map
 sections:
   - section_intro: Start
+  - section_basic: Basic info
   - section_petitioner: People you want to protect
   - section_incidents: What happened
   - section_protections: Protections
@@ -73,6 +74,8 @@ code: |
   accept_terms  
   whats_next
   content_warning
+
+  nav.set_section('section_basic')
   if not experienced_abuse:
     no_abuse_kickout
   if in_illinois == False:
@@ -80,26 +83,29 @@ code: |
   if users[0].age_in_years() < 18:
     too_young_kickout
   
-  nav.set_section('section_petitioner')
-  protect_whom
-  if protect_whom['me']:
-    if user_military and has_military_order:
-      military_order_note
+  
+  users[0].name.first
+  if filing_for_whom != "me":
+    about_behalf
+    users[1].name.first
+    filing_for_whom_sets_there_are_any
+  #protect_whom
+  #if protect_whom['me']:
+  #  if user_military and has_military_order:
+  #    military_order_note
   trial_court_index
   if jurisdiction_type.all_false():
     other_jurisdiction_location
   
-    
-  
-  users[0].name.first
-  hide_address
-  users[0].address.address
   other_parties[0].name.first
   if not user_relationship['unrelated']:
     related_note
   set_progress(20)
   
-  protect_whom_sets_there_are_any
+  #protect_whom_sets_there_are_any
+  nav.set_section('section_petitioner')
+  hide_address
+  users[0].address.address
   if others_protected.there_are_any:
     others_protected.gather()
     pop_protected_code
@@ -110,6 +116,7 @@ code: |
   abusive_acts_intro
   abusive_acts.gather()
   if trial_court_index == -1:
+    police_check_catch
     abuse_type
     
   nav.set_section('section_protections')
@@ -149,7 +156,8 @@ code: |
   other_parties[0].race
   if trial_court_index == -1:
     other_parties[0].has_alias
-  other_parties[0].ssn
+  else:
+    other_parties[0].ssn
   knows_respondent_dob
   other_parties[0].weight
   other_parties[0].eyes
@@ -212,7 +220,7 @@ code: |
   pop_protected_code  
   forms_assembling
   addendum_check
-  adult_minor_sorting
+  #adult_minor_sorting
   snapshot_forms
   set_progress(100)
   get_docs_screen
@@ -250,12 +258,12 @@ code: |
 #others protected gather code block
 code: |
   others_protected[i].name.first
-  if others_protected[i].why_include['military']:
-    others_protected[i].military_order
+  #if others_protected[i].why_include['military']:
+  #  others_protected[i].military_order
   if others_protected[i].why_include.all_false():
     others_protected[i].cannot_include
   else:
-    others_protected[i].birthdate
+    others_protected[i].is_minor
     if trial_court_index != -1:
       if hide_address:
         others_protected[i].use_safe_address
@@ -273,7 +281,7 @@ code: |
         others_protected.pop(popping_index)
       else:
         #originally this was just incrementing the index, but I added these variable checks because some variables were not being defined when switching counties
-        others_protected[popping_index].birthdate
+        others_protected[popping_index].is_minor
         if trial_court_index != -1:
           if hide_address == False or others_protected[popping_index].use_safe_address == False:
             others_protected[popping_index].address.address
@@ -288,6 +296,14 @@ code: |
   if trial_court_index == -1:
     abusive_acts[i].police_check
   abusive_acts[i].complete = True
+---
+depends on:
+  - trial_court_index
+code: |
+  if trial_court_index == -1:
+    for act in abusive_acts:
+      act.police_check
+  police_check_catch = True
 ---
 code: |
   parents_guardians[i].name.first
@@ -373,6 +389,14 @@ subquestion: |
   * Stay a certain distance away from the survivor,
   * Stay away from specific places like a home, a school, a daycare, or an office, and
   * Transfer to another school, if the survivor and the perpetrator attend the same school.
+
+  ${collapse_template(have_mpo)}
+---
+template: have_mpo
+subject: |
+  **Note for service members of the Illinois National Guard and other reserve military components**
+content: |
+  If you have already gotten a Military Protective Order against the perpetrator, you should bring a copy of it to your CNCO hearing.
 ---
 id: content warning
 continue button field: content_warning
@@ -412,22 +436,22 @@ template: assault_conduct_define
 subject: |
   **Definitions of sexual assault and non-consensual sexual conduct**
 content: |
-  In Illinois, **sexual assault** occurs when a person does non-consensual sexual conduct or non-consensual sexual penetration.
+  In Illinois, **sexual assault** occurs when a person does non-consensual sexual conduct or non-consensual sexual penetration. It is sometimes called **rape**.
 
   **Sexual conduct** can be:
 
-  * Touching or fondling someone's genitalia, anus, or breast over or under clothes,
+  * Touching or fondling someone's genitals, anus, or breast over or under clothes,
   * Touching or fondling any part of the body of a child under the age of 13 for the purpose of sexual gratification, or
   * Transferring or transmitting semen on any part of a clothed or unclothed body.
 
-  **Sexual penetration** is the putting of a body part, object, or animal into someone's genitalia, anus, or mouth.
+  **Sexual penetration** is the putting of a body part, object, or animal into someone's genitals, anus, or mouth.
   
   Conduct is **non-consensual** when it is done without the consent of both people, and it includes situations where:
   
   * The perpetrator uses force or threatens to use force against the survivor,
   * The perpetrator knows that the survivor is unable to understand what is happening or cannot give informed consent,
-  The perpetrator is a family member of the survivor, and the survivor is under 18 years old; or
-  The perpetrator is 17 years old or older and holds a position of trust, authority, or supervision over the survivor, and the survivor is between 13 and 17 years old.
+  * The perpetrator is a family member of the survivor, and the survivor is under 18 years old, or
+  * The perpetrator is 17 years old or older and holds a position of trust, authority, or supervision over the survivor, and the survivor is between 13 and 17 years old.
 ---
 id: no abuse kickout
 event: no_abuse_kickout
@@ -451,6 +475,8 @@ fields:
     datatype: yesnoradio
     js show if:
       val('user_military') === true
+  - note: |
+      You should to bring a copy of your Military Protective Order to your hearing.
 ---
 id: military order note
 continue button field: military_order_note
@@ -492,7 +518,7 @@ question: |
 subquestion: |
   You can file your case in the county:
   
-  * Where you or who you want to protect lives,
+  * Where you or who you are filing for lives,
   * Where the person you are filing against lives, or
   * Where the abuse or assault occurred.
 fields:
@@ -562,6 +588,26 @@ subject: |
 content: |  
   Visit **[Illinois Court Help](https://www.ilcourthelp.gov/)**, or you can call or text (833) 411-1121 for assistance.
 ---
+id: filing for whom
+question: |
+  Do you want a Civil No Contact Order for yourself?
+subquestion: |
+  If you want the CNCO to protect both yourself and other people, you should click **Yes**.
+fields:
+  - no label: filing_for_whom
+    input type: radio
+    choices:
+      - Yes: me
+      - No, I want to file on behalf of a minor child.: child
+      - No, I want to file on behalf of a high risk adult who can't file for themself.: adult
+---
+id: about filing on behalf of
+continue button field: about_behalf
+question: |
+  About filing for someone else
+subquestion: |
+  This program allows you to make forms to ask for a CNCO for someone else. You should answer the following questions from the point of view of ${users[1].name.full(middle='full')}.
+---
 id: protect whom
 question: |
   Who do you want this Civil No Contact Order to protect?
@@ -606,36 +652,87 @@ fields:
   - code: |
       users[0].name_fields()
 ---
+id: behalf of name
+sets:
+    - users[1].name.first
+    - users[1].name.last
+    - users[1].name.middle
+    - users[1].name.suffix
+question: |
+  Who are you filing on behalf of?
+fields:
+  - code: |
+      users[1].name_fields()
+---
 sets:
   - other_parties[0].name.first
 id: other parties name
 question: |
-  What is the perpetrator's name?
+  Who did the sexual abuse or sexual assault?
 subquestion: |
-  This is the person you will file the Civil No Contact Order against. In court and on the forms, they will be listed as the **Respondent**.
+  This is the person you will file the Civil No Contact Order against. They are usually called the **{perpetrator}**. In court and on the forms, they will be listed as the **Respondent**.
 
   You will need to enter their full name. If you do not know their full name, you may want to talk with a lawyer to discuss your options. Use **[Get Legal Help](https://www.illinoislegalaid.org/get-legal-help)** to find free or low-cost legal services in your area.
 fields:
   - code: |
       other_parties[0].name_fields()
+terms:
+  - "perpetrator":
+      The perpetrator is the person who did the abusive, harmful, or threatening behavior.
+---
+#words used in relationship question
+depends on:
+  - filing_for_whom
+  - users[1].name.first
+  - users[1].name.middle
+  - users[1].name.last
+  - users[1].name.suffix
+  - other_parties[0].name.first
+  - other_parties[0].name.middle
+  - other_parties[0].name.last
+  - other_parties[0].name.suffix
+code: |
+  if filing_for_whom == "me":
+    we_they = "we"
+    i_they = "I"
+    i_behalf = "I"
+    their_respondents = "their"
+    am_is = "am"
+    they_respondent = "they"
+    my_their = "my"
+    you_behalf = "you"
+  else:
+    we_they = "they"
+    i_they = "their"
+    i_behalf = users[1].name.full(middle='full')
+    their_respondents = other_parties[0].name.full(middle='full')
+    their_respondents += " 's"
+    am_is = "is"
+    they_respondent = other_parties[0].name.full(middle='full')
+    my_their = "their"
+    you_behalf = users[1].name.full(middle='full')
 ---
 id: relationship
 question: |
+  % if filing_for_whom == "me":
   How are you related to ${other_parties[0].name.full(middle='full')}?
+  % else:
+  How is ${users[1].name.full(middle='full')} related to ${other_parties[0].name.full(middle='full')}?
+  % endif
 fields:
   - Relationship: user_relationship
     datatype: checkboxes
     none of the above: False
     choices:
-      - We are not related.: unrelated
-      - We dated.: dated
-      - We are related through current or past marriage. For example, I am their spouse, ex-spouse, in-law, step-child, or other relative.: marriage
-      - We have children together.: children
-      - We are related through blood. For example, I am their parent, child, sibling, grandchild, grantparent, or other blood relative.: blood   
-      - We have a blood relationship through a child. For example, I am their niece's parent.: blood_child
-      - We share or have shared a home.: home
-      - We have a family or household relationship through a child I am the adoptive parent, legal guardian, or custodian of.: adopt_child
-      - They are my personal caregiver.: caregiver
+      - ${capitalize(we_they)} are not related.: unrelated
+      - ${capitalize(we_they)} dated.: dated
+      - ${capitalize(we_they)} are related through current or past marriage. For example, ${i_behalf} ${am_is} ${their_respondents} spouse, ex-spouse, in-law, step-child, or other relative.: marriage
+      - ${capitalize(we_they)} have children together.: children
+      - ${capitalize(we_they)} are related through blood. For example, ${i_behalf} ${am_is} ${their_respondents} parent, child, sibling, grandchild, grantparent, or other blood relative.: blood   
+      - ${capitalize(we_they)} have a blood relationship through a child. For example, ${i_behalf} ${am_is} ${their_respondents} niece's parent.: blood_child
+      - ${capitalize(we_they)} share or have shared a home.: home
+      - ${capitalize(we_they)} have a family or household relationship through a child ${i_behalf} ${am_is} the adoptive parent, legal guardian, or custodian of.: adopt_child
+      - They are ${my_their} personal caregiver.: caregiver
 validation code: |
     if user_relationship['unrelated']:
       if user_relationship['dated'] or user_relationship['marriage'] or user_relationship['children'] or user_relationship['blood'] or user_relationship['blood_child'] or user_relationship['adopt_child'] or user_relationship['caregiver']:
@@ -841,6 +938,13 @@ fields:
     datatype: BirthDate
     alMax: today()
 ---
+id: others protected is minor
+question: |
+  Is ${others_protected[i].name.full(middle='full')} under 18 years old?
+fields:
+  - no label: others_protected[i].is_minor
+    datatype: yesnoradio
+---
 on change: 
   protect_whom['minor']: |
     undefine('protect_whom_sets_there_are_any')
@@ -855,6 +959,17 @@ code: |
   if protect_whom['minor'] or protect_whom['adult']:
     others_protected.there_are_any = True
   protect_whom_sets_there_are_any = True
+---
+on change:
+  filing_for_whom: |
+    undefine('filing_for_whom_sets_there_are_any')
+    if others_protected.number_gathered() == 0:
+      undefine('others_protected.there_are_any')
+---
+code: |
+  if filing_for_whom == "child" or filing_for_whom == "adult":
+    others_protected.there_are_any = False
+  filing_for_whom_sets_there_are_any = True
 ---
 id: others protected there are any
 question: |
@@ -885,6 +1000,10 @@ fields:
         #show if: protect_whom['minor'] or protect_whom['adult']
       - They are a member of the Illinois National Guard or another reserve military component who has received a Military Protective Order.: military
       - They work for a rape crisis center providing services to a survivor of ${other_parties[0].name.full(middle='full')}.: crisis_center
+  - note: |
+      **Note:** You should to bring a copy of their Military Protective Order to your hearing.
+    js show if: 
+      val('others_protected[i].why_include["military"]') === true
 ---
 id: include military order
 continue button field: others_protected[i].military_order
@@ -944,9 +1063,9 @@ fields:
       If you don't remember the exact date, enter the month and year. Use abbreviations if needed.
   - Time: abusive_acts[i].time
     required: False
-    maxlength: 15
+    maxlength: 20
     help: |
-      If you don't remember the exact time, you can enter an estimate, a general time such as "morning" or "late afternoon," or leave this blank.
+      If you don't remember the exact time, enter "morning" or "afternoon" or "night." Use abbreviations if needed.
   - Location: abusive_acts[i].place
     maxlength: 50
     help: |
@@ -1059,15 +1178,15 @@ fields:
         show if: trial_court_index == -1
       - "Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people": no_contact
         show if: trial_court_index == -1
-      - "Stay away from the locations of the survivor, survivor's family or household member's work or school": away_places
+      - "Stay away from the locations of the my and others' work or school": away_places
         show if: trial_court_index == -1
-      - "Stay away from my pets and property": away_property
+      - "Stay away from my and others' pets and property": away_property
         show if: trial_court_index == -1
-      - "Stay away from me and others, and not take, hide, or damage any of my property or pets": away_people
-        show if: trial_court_index != -1
       - "Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people": no_contact
         show if: trial_court_index != -1
-      - "Stay away from the locations of the survivor, survivor's family and household member's home, work, school, or daycare": away_places
+      - "Stay away from me and others, as well as stay away from the my and others' home, work, school, or daycare": away_places
+        show if: trial_court_index != -1
+      - "Not take, hide, or damage any of the my or others' property or pets": away_people
         show if: trial_court_index != -1
   - In feet, how far away should ${other_parties[0].name.full(middle='full')} stay?: distance_state
     datatype: integer
@@ -1078,7 +1197,7 @@ fields:
       code: |
         trial_court_index != -1
     js show if: |
-      (val("protection_requested['away_people']") === true || val("protection_requested['away_places']") === true)
+      val("protection_requested['away_places']") === true
   - In feet, how far away should ${other_parties[0].name.full(middle='full')} stay from you and others?: distance_people
     datatype: integer
     max: 999
@@ -1365,7 +1484,7 @@ code: |
   adults_protected.clear()
   if others_protected.there_are_any:
     for other in others_protected:
-      if other.age_in_years() < 18:
+      if other.is_minor:
         minors_protected.append(other)
       else:
         adults_protected.append(other)
@@ -2370,7 +2489,7 @@ code: |
   if others_protected.there_are_any:
     if others_protected.number_gathered() > 0:
       for other in others_protected:
-        if other.age_in_years() < 18:
+        if other.is_minor:
           any_minors = True
         else:
           any_adults = True
@@ -2421,7 +2540,7 @@ question: |
 subquestion: |
   You can file your case in the Illinois county:
   
-  * Where you or who you want to protect lives,
+  * Where you or who you are filing for lives,
   * Where the person you are filing against lives, or
   * Where the abuse occurred.
 
@@ -2628,9 +2747,13 @@ attachment:
     - "circuit_court": ${court_circuit.upper()}
     - "filing_county": ${trial_court.address.county.upper()}
     - "user_name": ${users[0].name.full(middle='full')}
+    - "behalf_of_name": |
+        % if filing_for_whom != "me":
+        ${users[1].name.full(middle='full')}
+        % endif
     - "others_protected": ${others_protected.full_names() if others_protected.there_are_any else ""}
-    - "protect_a_minor": ${any_minors}
-    - "protect_an_adult": ${any_adults}
+    - "protect_a_minor": ${True if filing_for_whom == "child" else False}
+    - "protect_an_adult": ${True if filing_for_whom == "adult" else False}
     - "independent": ${True}
     - "respondent_has_parents": |
         % if prohibit_school and same_school and respondent_is_minor and parents_or_guardians == "Parents":
@@ -2790,9 +2913,13 @@ attachment:
     - "plenary_type": ${False}
     - "independent": ${True}
     - "user_name": ${users[0].name.full(middle='full')}
+    - "behalf_of_name": |
+        % if filing_for_whom != "me":
+        ${users[1].name.full(middle='full')}
+        % endif
     - "others_protected": ${others_protected.full_names() if others_protected.there_are_any else ""}
-    - "protect_a_minor": ${any_minors}
-    - "protect_an_adult": ${any_adults}
+    - "protect_a_minor": ${True if filing_for_whom == "child" else False}
+    - "protect_an_adult": ${True if filing_for_whom == "adult" else False}
     - "respondent_has_parents": |
         % if prohibit_school and same_school and respondent_is_minor and parents_or_guardians == "Parents":
         ${True}
@@ -2926,9 +3053,13 @@ attachment:
     - "plenary_type": ${True}
     - "independent": ${True}
     - "user_name": ${users[0].name.full(middle='full')}
+    - "behalf_of_name": |
+        % if filing_for_whom != "me":
+        ${users[1].name.full(middle='full')}
+        % endif
     - "others_protected": ${others_protected.full_names() if others_protected.there_are_any else ""}
-    - "protect_a_minor": ${any_minors}
-    - "protect_an_adult": ${any_adults}
+    - "protect_a_minor": ${True if filing_for_whom == "child" else False}
+    - "protect_an_adult": ${True if filing_for_whom == "adult" else False}
     - "respondent_has_parents": |
         % if prohibit_school and same_school and respondent_is_minor and parents_or_guardians == "Parents":
         ${True}
@@ -3151,7 +3282,8 @@ attachment:
     - "temp_petition_2": ${True}
     - "is_petition_3": ${True}
     - "temp_petition_3": ${True}
-    - "behalf_petitioner": ${users[0].name.full(middle='full')}
+    - "on_behalf_of": ${users[0].name.full(middle='full') if filing_for_whom != "me" else ""}
+    - "behalf_petitioner": ${users[1].name.full(middle='full') if filing_for_whom != "me" else users[0].name.full(middle='full')}
     #- "behalf_petitioner": |
     #    % if others_protected.there_are_any:
     #    % if others_protected.number_gathered() > 0:
@@ -3167,9 +3299,9 @@ attachment:
     - "emergency_check_2": ${order_type['emergency']}
     - "plenary_check": ${order_type['plenary']}
     - "petitioner_name_1": ${users[0].name.full(middle='full')}
-    - "petitioner_name_2": ${users[0].name.full(middle='full')}
-    - "child_name": ${child_list if others_protected.there_are_any else ""}
-    - "adult_name": ${adult_list if others_protected.there_are_any else ""}
+    - "petitioner_name_2": ${users[0].name.full(middle='full') if filing_for_whom == "me" else users[1].name.full(middle='full')}}
+    - "child_name": ${users[1].name.full(middle='full') if filing_for_whom == "child" else ""}
+    - "adult_name": ${users[1].name.full(middle='full') if filing_for_whom == "adult" else ""}
     - "safe_address": ${hide_address}
     - "address_is_residence": ${False if hide_address else True}
     - "petitioner_address": ${users[0].address.on_one_line(bare=True)}
@@ -3205,11 +3337,11 @@ attachment:
     - "no_police_report": ${ False if  abusive_acts[0].police_check else True}
     - "police_report_1": ${abusive_acts[0].police_number if abusive_acts[0].police_check else ""}
     - "others_protected_list": |     
-        % if others_protected.there_are_any and not protect_whom['me']:
+        % if others_protected.there_are_any and filing_for_whom != "me":
         ${others_protected.full_names()}
-        % elif protect_whom['me'] and not others_protected.there_are_any:
+        % elif filing_for_whom == "me" and not others_protected.there_are_any:
         ${users[0].name.full(middle='full')}
-        % elif others_protected.there_are_any and protect_whom['me']:
+        % elif others_protected.there_are_any and filing_for_whom == "me":
         % if others_protected.number_gathered() == 1:
         ${users[0].name.full(middle='full')} and ${others_protected.full_names()}
         % elif others_protected.number_gathered() == 0:
@@ -3483,7 +3615,8 @@ attachment:
   editable: False
   pdf template file: cook_cnco_order.pdf
   fields:
-    - "user_name": ${users[0].name.full(middle='full')}
+    - "filer": ${users[0].name.full(middle='full') if filing_for_whom != "me" else ""}
+    - "behalf_of": ${users[1].name.full(middle='full') if filing_for_whom != "me" else users[0].name.full(middle='full')}
     #- "additional_protected": |
     #    % if others_protected.there_are_any:
     #    ${others_protected.full_names()}
@@ -3498,9 +3631,19 @@ attachment:
     - "independent": ${True}
     - "emergency": ${True}
     - "plenary": ${False}
-    - "petitioner_name": ${users[0].name.full(middle='full')}
+    - "petitioner_name": ${users[0].name.full(middle='full') if filing_for_whom == "me" else users[1].name.full(middle='full')}
     - "petitioner_name_and_address": |
+        % if hide_address:
+        % if filing_for_whom == "me":
+        ${users[0].name.full(middle='full')}
+        % else:
+        ${users[1].name.full(middle='full')}
+        % endif
+        % elif filing_for_whom == "me":
         ${users[0].name.full(middle='full')}, ${users[0].address.on_one_line(bare=True)}
+        % else:
+        ${users[1].name.full(middle='full')}, ${users[0].address.on_one_line(bare=True)}
+        % endif
     - "safe_address": ${hide_address}
     - "respondent_name_and_address": |
         ${other_parties[0].name.full(middle='full')}, ${other_parties[0].address.on_one_line(bare=True)}
@@ -3555,6 +3698,7 @@ attachment:
     - "school_daycare_address": ${comma_and_list(away_school_daycare_list)}
     - "other_relief_check": ${other_parties[0].anything_else}
     - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
+    - "user_name": ${users[0].name.full(middle='full')}
     - "user_address_line_one": ${users[0].address.line_one(bare=True)}
     - "user_city": ${users[0].address.city}
     - "user_state": ${users[0].address.state}
@@ -3570,7 +3714,8 @@ attachment:
   editable: False
   pdf template file: cook_cnco_order.pdf
   fields:
-    - "user_name": ${users[0].name.full(middle='full')}
+    - "filer": ${users[0].name.full(middle='full') if filing_for_whom != "me" else ""}
+    - "behalf_of": ${users[1].name.full(middle='full') if filing_for_whom != "me" else users[0].name.full(middle='full')}
     #- "additional_protected": |
     #    % if others_protected.there_are_any:
     #    ${others_protected.full_names()}
@@ -3585,9 +3730,19 @@ attachment:
     - "independent": ${True}
     - "emergency": ${False}
     - "plenary": ${True}
-    - "petitioner_name": ${users[0].name.full(middle='full')}
+    - "petitioner_name": ${users[0].name.full(middle='full') if filing_for_whom == "me" else users[1].name.full(middle='full')}
     - "petitioner_name_and_address": |
+        % if hide_address:
+        % if filing_for_whom == "me":
+        ${users[0].name.full(middle='full')}
+        % else:
+        ${users[1].name.full(middle='full')}
+        % endif
+        % elif filing_for_whom == "me":
         ${users[0].name.full(middle='full')}, ${users[0].address.on_one_line(bare=True)}
+        % else:
+        ${users[1].name.full(middle='full')}, ${users[0].address.on_one_line(bare=True)}
+        % endif
     - "safe_address": ${hide_address}
     - "respondent_name_and_address": |
         ${other_parties[0].name.full(middle='full')}, ${other_parties[0].address.on_one_line(bare=True)}
@@ -3643,6 +3798,7 @@ attachment:
     - "other_relief_check": ${other_parties[0].anything_else}
     - "other_relief_text": ${other_parties[0].what_else if other_parties[0].anything_else else ""}
     - "user_address_line_one": ${users[0].address.line_one(bare=True)}
+    - "user_name": ${users[0].name.full(middle='full')}
     - "user_city": ${users[0].address.city}
     - "user_state": ${users[0].address.state}
     - "user_zip": ${users[0].address.zip}
@@ -3684,6 +3840,75 @@ attachment:
     - "user_phone_number": ${ phone_number_formatted(users[0].phone_number) }
     - "user_email": ${ users[0].email if users[0].has_email_address else ""}
 ---
+section: Basic info
+id: basic info review screen
+event: section_basic
+question: |
+  Basic info
+subquestion: |
+  Edit your answers below.
+review:
+  - Edit: users[0].name.first
+    button: |
+      **Your name:**
+      ${users[0].name.full(middle='full')}
+  - Edit: filing_for_whom
+    button: |
+      **You are filing for:**
+      % if filing_for_whom == "me":
+      Myself
+      % elif filing_for_whom == "child":
+      A child
+      % elif filing_for_whom == "adult":
+      An adult who cannot file for themself
+      % endif
+  - Edit: users[1].name.first
+    button: |
+      **Who are you filing on behalf of?**
+      ${users[1].name.full(middle='full')}
+    show if: filing_for_whom != "me"
+  - Edit: other_parties[0].name.first
+    button: |  
+      **Perpetrator's name:**
+      ${other_parties[0].name.full(middle='full')}
+  - Edit: 
+      - trial_court_index
+      - recompute:
+        - filing_county
+    button: |
+      **You are filing in:**
+      ${end_in_county(filing_county)}
+  - Edit: cook_district
+    button: |
+      **Which courthouse will you file in?**
+      % if cook_district == '15':
+      First Municipal District, Daley Center, 50 W. Washington Street, Chicago
+      % elif cook_district == '16':
+      Second Municipal District, 5600 Old Orchard Road, Skokie
+      % elif cook_district == '17':
+      Third Municipal District, 2121 Euclid Avenue, Rolling Meadows
+      % elif cook_district == '18':
+      Fourth Municipal District, 1500 Maybrook Drive, Maywood
+      % elif cook_district == '19':
+      Fifth Municipal District, 10220 S. 76th Avenue, Bridgeview
+      % elif cook_district == '20':
+      Sixth Municipal District, 16501 South Kedzie Parkway, Markham
+      % endif
+    show if: trial_court.address.county.lower() == "cook"
+  - Edit: jurisdiction_type
+    button: |
+      **You are filing in ${end_in_county(trial_court.address.county)} because:**
+      
+      % if jurisdiction_type['I live here']:
+      * I or someone I am filing for live in ${end_in_county(trial_court.address.county)}.
+      % endif
+      % if jurisdiction_type['Respondent lives here']:
+      * The person I am filing against lives in ${end_in_county(trial_court.address.county)}.
+      % endif
+      % if jurisdiction_type['Abuse was here']:
+      * The abuse took place in ${end_in_county(trial_court.address.county)}.
+      % endif
+---
 section: People you want to protect
 id: petitioner review screen
 event: section_petitioner
@@ -3692,6 +3917,25 @@ question: |
 subquestion: |
   Edit your answers below.
 review:
+  - Edit: users[0].name.first
+    button: |
+      **Your name:**
+      ${users[0].name.full(middle='full')}
+  - Edit: filing_for_whom
+    button: |
+      **You are filing for:**
+      % if filing_for_whom == "me":
+      Myself
+      % elif filing_for_whom == "child":
+      A child
+      % elif filing_for_whom == "adult":
+      An adult who cannot file for themself
+      % endif
+  - Edit: users[1].name.first
+    button: |
+      **Who are you filing on behalf of?**
+      ${users[1].name.full(middle='full')}
+    show if: filing_for_whom != "me"
   - Edit: protect_whom
     button: |
       **Who do you want to protect?**
@@ -3716,10 +3960,6 @@ review:
         No
         % endif
     show if: protect_whom['me']
-  - Edit: users[0].name.first
-    button: |
-      **Your name:**
-      ${users[0].name.full(middle='full')}
   - Edit: users[0].phone_number
     button: |
       **Your safe phone number:**
@@ -3733,10 +3973,6 @@ review:
       **Your email address:**
       ${users[0].email}
     show if: users[0].has_email_address
-  - Edit: other_parties[0].name.first
-    button: |  
-      **Perpetrator's name:**
-      ${other_parties[0].name.full(middle='full')}
   - Edit: hide_address
     button: |
       **Do you want to keep your home address hidden?**
@@ -3757,7 +3993,8 @@ review:
     button: |
       **Do you want to protect anyone else with the CNCO?**
       ${word(yesno(others_protected.there_are_any))}
-    show if: protect_whom['minor'] == False and protect_whom['adult'] == False
+    show if: filing_for_whom == "me"
+    #show if: protect_whom['minor'] == False and protect_whom['adult'] == False
   - Edit: others_protected.revisit
     button: |
       **Others to protect: (Edit to change names, addresses, and other information)**
@@ -3818,10 +4055,14 @@ review:
       % if x.why_include.all_false():
       No applicable reason
       % endif
-  - Edit: x.birthdate
+  #- Edit: x.birthdate
+  #  button: |
+  #    **${x.name.full(middle='full')}'s birth date:**
+  #    ${x.birthdate}
+  - Edit: x.is_minor
     button: |
-      **${x.name.full(middle='full')}'s birth date:**
-      ${x.birthdate}
+      **Is ${x.name.full(middle='full')} under 18 years old?**
+      ${word(yesno(x.is_minor))}
   - Edit: x.use_safe_address
     button: |
       **Do you want to use the safe mailing address for ${x.name.full(middle='full')}?**
@@ -4676,7 +4917,26 @@ subquestion: |
   Edit your answers below.
 review: 
   - note: |
-      <h4>People you want to protect</h4>
+      <h4>Basic info</h4>
+  - Edit: users[0].name.first
+    button: |
+      **Your name:**
+      ${users[0].name.full(middle='full')}
+  - Edit: filing_for_whom
+    button: |
+      **You are filing for:**
+      % if filing_for_whom == "me":
+      Myself
+      % elif filing_for_whom == "child":
+      A child
+      % elif filing_for_whom == "adult":
+      An adult who cannot file for themself
+      % endif
+  - Edit: users[1].name.first
+    button: |
+      **Who are you filing on behalf of?**
+      ${users[1].name.full(middle='full')}
+    show if: filing_for_whom != "me"
   - Edit: protect_whom
     button: |
       **Who do you want to protect?**
@@ -4701,10 +4961,12 @@ review:
         No
         % endif
     show if: protect_whom['me']
-  - Edit: users[0].name.first
-    button: |
-      **Your name:**
-      ${users[0].name.full(middle='full')}
+  - Edit: other_parties[0].name.first
+    button: |  
+      **Perpetrator's name:**
+      ${other_parties[0].name.full(middle='full')}
+  - note: |
+      <h4>People you want to protect</h4> 
   - Edit: users[0].phone_number
     button: |
       **Your safe phone number:**
@@ -4718,10 +4980,7 @@ review:
       **Your email address:**
       ${users[0].email}
     show if: users[0].has_email_address
-  - Edit: other_parties[0].name.first
-    button: |  
-      **Perpetrator's name:**
-      ${other_parties[0].name.full(middle='full')}
+  
   - Edit: hide_address
     button: |
       **Do you want to keep your home address hidden?**
@@ -4742,7 +5001,8 @@ review:
     button: |
       **Do you want to protect anyone else with the CNCO?**
       ${word(yesno(others_protected.there_are_any))}
-    show if: protect_whom['minor'] == False and protect_whom['adult'] == False
+    show if: filing_for_whom == "me"
+    #show if: protect_whom['minor'] == False and protect_whom['adult'] == False
   - Edit: others_protected.revisit
     button: |
       **Others to protect: (Edit to change names, addresses, and other information)**
