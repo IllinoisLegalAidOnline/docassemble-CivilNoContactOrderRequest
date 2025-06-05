@@ -86,7 +86,7 @@ code: |
   
   users[0].name.first
   if filing_for_whom != "me":
-    about_behalf
+    #about_behalf
     users[1].name.first
     filing_for_whom_sets_there_are_any
   #protect_whom
@@ -105,7 +105,10 @@ code: |
   #protect_whom_sets_there_are_any
   nav.set_section('section_petitioner')
   hide_address
-  users[0].address.address
+  if filing_for_whom != "me" and not hide_address:
+    users[1].address.address
+  else:
+    users[0].address.address
   if others_protected.there_are_any:
     others_protected.gather()
     pop_protected_code
@@ -154,15 +157,15 @@ code: |
   else:
     other_parties[0].state_gender
   other_parties[0].race
-  if trial_court_index == -1:
-    other_parties[0].has_alias
-  else:
-    other_parties[0].ssn
   knows_respondent_dob
   other_parties[0].weight
   other_parties[0].eyes
   other_parties[0].hair
   other_parties[0].features
+  if trial_court_index == -1:
+    other_parties[0].has_alias
+  else:
+    other_parties[0].ssn
   other_parties[0].drivers_license
   if other_parties[0].has_vehicle:
     other_parties[0].license_plate
@@ -204,7 +207,8 @@ code: |
         other_parties[0].alt_email 
   if trial_court_index == -1 and service_method == "sheriff":  
     service_information
-  
+
+  users[0].address.address
   users[0].phone_number
   if users[0].has_email_address:
     users[0].email
@@ -415,8 +419,9 @@ subquestion: |
   This program is not a first response resource or a therapuetic resource. If you need such help, you can:
 
   * Call 911 or local law enforcement (police).
-  * Call RAINN, a 24-hour national sexual assault hotline at (800) 656-HOPE (4673). There is also an [**online chat service**](https://hotline.rainn.org/online).
   * Call a rape crisis hotline. To find the nearest center and call its 24-hour hotline, go to the [**Illinois Coalition Against Sexual Assault website**](https://icasa.org/) or call (217) 753-4117.  For Chicago, you can contact the Chicago Rape Crisis Hotline online at [**Resilience**](https://www.ourresilience.org/) or call (888) 293-2080.
+  * Call RAINN, a 24-hour national sexual assault hotline at (800) 656-HOPE (4673). There is also an [**online chat service**](https://hotline.rainn.org/online).
+  * Call 
   * Call or text the 988 Lifeline at 988.  There is also an [**online chat service**](https://chat.988lifeline.org/).
 ---
 #replace the lengthy subquestion with a shorter summary and link to https://www.illinoislegalaid.org/legal-information/sexual-assault-and-civil-no-contact-orders-common-questions#whatissexualassault once the page is live
@@ -436,7 +441,7 @@ template: assault_conduct_define
 subject: |
   **Definitions of sexual assault and non-consensual sexual conduct**
 content: |
-  In Illinois, **sexual assault** occurs when a person does non-consensual sexual conduct or non-consensual sexual penetration. It is sometimes called **rape**.
+  In Illinois, **sexual assault** occurs when a person does non-consensual sexual conduct or non-consensual sexual penetration. In some cases it can be called **rape**.
 
   **Sexual conduct** can be:
 
@@ -518,7 +523,7 @@ question: |
 subquestion: |
   You can file your case in the county:
   
-  * Where you or who you are filing for lives,
+  * Where you or the person you are filing for lives,
   * Where the person you are filing against lives, or
   * Where the abuse or assault occurred.
 fields:
@@ -670,7 +675,7 @@ id: other parties name
 question: |
   Who did the sexual abuse or sexual assault?
 subquestion: |
-  This is the person you will file the Civil No Contact Order against. They are usually called the **{perpetrator}**. In court and on the forms, they will be listed as the **Respondent**.
+  This is the person you will file the Civil No Contact Order against. They are sometimes called the **{perpetrator}**. In court and on the forms, they will be listed as the **Respondent**.
 
   You will need to enter their full name. If you do not know their full name, you may want to talk with a lawyer to discuss your options. Use **[Get Legal Help](https://www.illinoislegalaid.org/get-legal-help)** to find free or low-cost legal services in your area.
 fields:
@@ -701,16 +706,38 @@ code: |
     they_respondent = "they"
     my_their = "my"
     you_behalf = "you"
+    were_was = "were"
+    do_does = "do"
+    you_them = "you_them"
+    your_their = "your"
+    me_behalf = "me"
+    my_behalf = "my"
+    go_goes = "go"
+    have_has = "have"
+    you_they = "you"
+    your_behalf = "your"
   else:
     we_they = "they"
     i_they = "their"
     i_behalf = users[1].name.full(middle='full')
     their_respondents = other_parties[0].name.full(middle='full')
-    their_respondents += " 's"
+    their_respondents += "'s"
     am_is = "is"
     they_respondent = other_parties[0].name.full(middle='full')
     my_their = "their"
     you_behalf = users[1].name.full(middle='full')
+    were_was = "was"
+    do_does = "does"
+    you_them = "them"
+    your_their = "their"
+    me_behalf = users[1].name.full(middle='full')
+    my_behalf = other_parties[0].name.full(middle='full')
+    my_behalf += " 's"
+    go_goes = "goes"
+    have_has = "has"
+    you_they = "they"
+    your_behalf = other_parties[0].name.full(middle='full')
+    your_behalf += "'s"
 ---
 id: relationship
 question: |
@@ -743,7 +770,7 @@ continue button field: related_note
 question: |
   Order of Protection
 subquestion: |
-  If the **{perpetrator}** of the abuse is family member, household member, boyfriend, girlfriend, or ex, you may want to apply for an Order of Protection instead of a CNCO. An Order of Protection can help with more issues and may be easier to get.
+  If the **{perpetrator}** of the abuse is a family member, household member, boyfriend, girlfriend, or ex, you may want to apply for an Order of Protection instead of a CNCO. An Order of Protection can help with more issues and may be easier to get.
   
   Use ILAO's [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) tool to help you find the protective order for your situation.
   
@@ -754,9 +781,9 @@ terms:
 ---
 id: hide address
 question: |
-  Do you want to keep your home address hidden?
+  ${capitalize(do_does)} ${you_behalf} want to keep ${your_their} home address hidden?
 subquestion: |
-  You do not have to include your home address if disclosing it would risk you or someone in your family or household being abused or assaulted. If you do not include your home address, you will need to enter a mailing address where you can receive court notices.
+  You do not have to include ${your_their} home address if disclosing it would risk ${you_them} or someone in ${your_their} family or household being abused or assaulted. If you do not include ${your_their} home address, you will need to enter a mailing address where ${you_behalf} can receive court notices.
 field: hide_address
 choices:
   - Yes: True
@@ -791,7 +818,9 @@ fields:
   - no label: others_protected.there_is_another
     datatype: yesnoradio
 ---
-id: get address
+sets:
+  - users[0].address.address
+id: get user address
 question: |
   % if hide_address:
   What is your mailing address?
@@ -815,6 +844,33 @@ fields:
       states_list()
     default: IL      
   - ZIP code: users[0].address.zip
+---
+sets:
+  - users[1].address.address
+id: behalf of address
+question: |
+  % if hide_address:
+  What is ${users[1].name.full(middle='full')}'s mailing address?
+  % else:
+  What is ${users[1].name.full(middle='full')}'s home address?
+  % endif
+subquestion: |
+  % if hide_address:
+  **This address will appear on the court papers.** They may receive court notices and documents about their case at this address.
+  % else:
+  **This address will appear on the court papers.** If they do not want this, click **Back** to keep your address hidden.
+  % endif
+fields:
+  - Street address: users[1].address.address
+    address autocomplete: True
+  - Address line 2: users[1].address.unit
+    required: False
+  - City: users[1].address.city
+  - State: users[1].address.state
+    code: |
+      states_list()
+    default: IL      
+  - ZIP code: users[1].address.zip
 ---
 id: others protected address
 question: |
@@ -852,9 +908,9 @@ code: |
 ---
 id: user birthdate
 question: |
-  When were you born?
+  When ${were_was} ${you_behalf} born?
 fields:
-  - Your date of birth: users[0].birthdate
+  - ${your_behalf} date of birth: users[0].birthdate
     datatype: BirthDate
     alMax: today()
 ---
@@ -1028,7 +1084,7 @@ question: |
 subquestion: |
   The following questions will ask about the sexual assault or sexual abuse done by ${other_parties[0].name.full(middle='full')}.
   
-  You should be specific. Tell when and where each event happened, and how it affected you.
+  You should be specific. Tell when and where each event happened, and how it affected ${you_behalf}.
   
   You should enter the most recent event first.
   
@@ -1174,19 +1230,19 @@ fields:
     datatype: checkboxes
     none of the above: True
     choices:
-      - "Stay away from me and others": away_people
+      - "Stay away from ${me_behalf} and others": away_people
         show if: trial_court_index == -1
-      - "Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people": no_contact
+      - "Stop contacting ${me_behalf} and others whether in person, by phone, by e-mail, by note or by sending messages through other people": no_contact
         show if: trial_court_index == -1
-      - "Stay away from the locations of the my and others' work or school": away_places
+      - "Stay away from the locations of ${my_behalf} and others' work or school": away_places
         show if: trial_court_index == -1
-      - "Stay away from my and others' pets and property": away_property
+      - "Stay away from ${my_behalf} and others' pets and property": away_property
         show if: trial_court_index == -1
-      - "Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people": no_contact
+      - "Stop contacting ${me_behalf} and others whether in person, by phone, by e-mail, by note or by sending messages through other people": no_contact
         show if: trial_court_index != -1
-      - "Stay away from me and others, as well as stay away from the my and others' home, work, school, or daycare": away_places
+      - "Stay away from ${me_behalf} and others, as well as stay away from my and others' home, work, school, or daycare": away_places
         show if: trial_court_index != -1
-      - "Not take, hide, or damage any of the my or others' property or pets": away_people
+      - "Not take, hide, or damage any of the ${my_behalf} or others' property or pets": away_people
         show if: trial_court_index != -1
   - In feet, how far away should ${other_parties[0].name.full(middle='full')} stay?: distance_state
     datatype: integer
@@ -1227,7 +1283,7 @@ template: stay_away_contact
 subject: |
   **What do "stay away" and "contact" mean here?**
 content: |
-  **Stay Away**: to refrain from both physical presence and nonphysical contact with the Petitioner directly, indirectly, or through third parties who may or may not know of the order. "Nonphysical contact" includes, but is not limited to, telephone calls, mail, e-mail, fax, and written notes.
+  **Stay Away**: to refrain from both physical presence and nonphysical contact with the survivor directly, indirectly, or through third parties who may or may not know of the order. "Nonphysical contact" includes, but is not limited to, telephone calls, mail, e-mail, fax, and written notes.
 
   **Contact**: includes any contact with the survivor, that is initiated or continued without the survivor’s consent, or that is in disregard of the survivor’s expressed desire that the contact be avoided or discontinued, including but not limited to being in the physical presence of the survivor; appearing within the sight of the survivor; approaching or confronting the survivor in a public place or on private property; appearing at the workplace or residence of the survivor; entering onto or remaining on property owned, leased, or occupied by the survivor; or placing an object on, or delivering an object to, property owned, leased, or occupied by the survivor.
 ---
@@ -1251,11 +1307,11 @@ fields:
 ---
 id: safe home address
 question: |
-  What is your home address?
+  What is ${your_behalf} home address?
 subquestion: |
-  You answered earlier that you want to hide your real address.
+  You answered earlier that you want to hide ${your_their} real address.
   
-  If you do not want ${other_parties[0].name.full(middle='full')} to know your home address, do not list it here. You may want to click **Back** and not include your home as a protected place.
+  If you do not want ${other_parties[0].name.full(middle='full')} to know ${your_their} home address, do not list it here. You may want to click **Back** and not include ${your_their} home as a protected place.
   
   The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
 fields:
@@ -1274,7 +1330,7 @@ id: other places
 question: |
   What other places do you want the court to order ${other_parties[0].name.full(middle='full')} to stay away from?
 subquestion: |
-  For example, you could name a store you go to regularly or a crisis center that is helping you.
+  For example, you could name a store ${you_behalf} ${go_goes} to regularly or a crisis center that is helping ${you_them}.
   
   Include any addresses if you know them. If you do not want ${other_parties[0].name.full(middle='full')} to know the addresses, do not list them here.
   
@@ -1355,14 +1411,14 @@ fields:
 ---
 id: school with perpetrator
 question: |
-  Do you and ${other_parties[0].name.full(middle='full')} go to the same school?
+  Do ${you_behalf} and ${other_parties[0].name.full(middle='full')} go to the same school?
 fields:
   - no label: same_school
     datatype: yesnoradio
 ---
 id: prohibit school which school
 question: |
-  Do you want the court to prohibit ${other_parties[0].name.full(middle='full')}  from attending the school you go to?
+  Do you want the court to prohibit ${other_parties[0].name.full(middle='full')} from attending the school ${you_behalf} ${go_goes} to?
 fields:
   - no label: prohibit_school
     datatype: yesnoradio
@@ -2170,15 +2226,15 @@ fields:
 ---
 id: any previous cook cases
 question: |
-  Have you filed any divorce or parentage cases with ${other_parties[0].name.full(middle="full")} in Cook County before?
+  ${capitalize(have_has)} ${you_behalf} filed any divorce or parentage cases with ${other_parties[0].name.full(middle="full")} in Cook County before?
 subquestion: |
-  This will help the court clerk in Cook County assign your case to the correct location. If you were involved in more than one, choose the most recent.
+  This will help the court clerk in Cook County assign your case to the correct location. If ${you_they} were involved in more than one, choose the most recent.
 fields:
   - no label: previous_cook_case_type
     datatype: radio
     choices:
-      - I was in an earlier **divorce** case with ${other_parties[0].name.full(middle="full")}.: divorce
-      - I was in an earlier **parentage** case with ${other_parties[0].name.full(middle="full")} involving children we had together.: parentage
+      - ${capitalize(i_behalf)} was in an earlier **divorce** case with ${other_parties[0].name.full(middle="full")}.: divorce
+      - ${capitalize(i_behalf)} was in an earlier **parentage** case with ${other_parties[0].name.full(middle="full")} involving children we had together.: parentage
       - No earlier divorce or parentage cases were filed in Cook County.: none
   - Date case was filed: previous_cook_case_date
     datatype: ThreePartsDate
@@ -2311,7 +2367,7 @@ choices:
   - No: False
 
 ---
-id: ops debut
+id: ops debug
 continue button field: ops_debug
 question: |
   Other OP Debug
@@ -2540,7 +2596,7 @@ question: |
 subquestion: |
   You can file your case in the Illinois county:
   
-  * Where you or who you are filing for lives,
+  * Where you or the person you are filing for lives,
   * Where the person you are filing against lives, or
   * Where the abuse occurred.
 
@@ -2778,7 +2834,14 @@ attachment:
         % endif
     - "abuser_name": ${ other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
-    - "user_address": ${users[0].address.on_one_line(bare=True)}
+    - "user_address": |
+        % if filing_for_whom == "me" or hide_address:
+        ${users[0].address.on_one_line(bare=True)}
+        % elif filing_for_whom == "me":
+        ${users[0].address.on_one_line(bare=True)}
+        % else:
+        ${users[1].address.on_one_line(bare=True)}
+        % endif
     - "use_safe_address": ${hide_address}
     - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if others_protected.there_are_any else ""}
     - "other_protected_address_1": |
@@ -2913,6 +2976,7 @@ attachment:
     - "plenary_type": ${False}
     - "independent": ${True}
     - "user_name": ${users[0].name.full(middle='full')}
+    - "main_protected_name": ${users[0].name.full(middle='full') if filing_for_whom == "me" else users[1].name.full(middle='full')}
     - "behalf_of_name": |
         % if filing_for_whom != "me":
         ${users[1].name.full(middle='full')}
@@ -2940,7 +3004,12 @@ attachment:
     - "behalf_of_names": ${ others_protected.full_names() if others_protected.there_are_any else ""}
     - "abuser_name": ${ other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
-    - "user_address": ${users[0].address.on_one_line(bare=True)}
+    - "user_address": |
+        % if filing_for_whom != "me" and not hide_address:
+        ${users[1].address.on_one_line(bare=True)}
+        % else:
+        ${users[0].address.on_one_line(bare=True)}
+        % endif
     - "use_safe_address": ${hide_address}
     - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if others_protected.there_are_any else ""}
     - "other_protected_address_1": |
@@ -3053,6 +3122,7 @@ attachment:
     - "plenary_type": ${True}
     - "independent": ${True}
     - "user_name": ${users[0].name.full(middle='full')}
+    - "main_protected_name": ${users[0].name.full(middle='full') if filing_for_whom == "me" else users[1].name.full(middle='full')}
     - "behalf_of_name": |
         % if filing_for_whom != "me":
         ${users[1].name.full(middle='full')}
@@ -3080,7 +3150,12 @@ attachment:
     - "behalf_of_names": ${ others_protected.full_names() if others_protected.there_are_any else ""}
     - "abuser_name": ${ other_parties[0].name.full(middle='full')}
     - "case_number": ${""}
-    - "user_address": ${users[0].address.on_one_line(bare=True)}
+    - "user_address": |
+        % if filing_for_whom != "me" and not hide_address:
+        ${users[1].address.on_one_line(bare=True)}
+        % else:
+        ${users[0].address.on_one_line(bare=True)}
+        % endif
     - "use_safe_address": ${hide_address}
     - "other_protected_name_1": ${others_protected[0].name.full(middle='full') if others_protected.there_are_any else ""}
     - "other_protected_address_1": |
@@ -3299,12 +3374,17 @@ attachment:
     - "emergency_check_2": ${order_type['emergency']}
     - "plenary_check": ${order_type['plenary']}
     - "petitioner_name_1": ${users[0].name.full(middle='full')}
-    - "petitioner_name_2": ${users[0].name.full(middle='full') if filing_for_whom == "me" else users[1].name.full(middle='full')}}
+    - "petitioner_name_2": ${users[0].name.full(middle='full') if filing_for_whom == "me" else users[1].name.full(middle='full')}
     - "child_name": ${users[1].name.full(middle='full') if filing_for_whom == "child" else ""}
     - "adult_name": ${users[1].name.full(middle='full') if filing_for_whom == "adult" else ""}
     - "safe_address": ${hide_address}
     - "address_is_residence": ${False if hide_address else True}
-    - "petitioner_address": ${users[0].address.on_one_line(bare=True)}
+    - "petitioner_address": |
+        % if filing_for_whom != "me" and not hide_address:
+        ${users[1].address.on_one_line(bare=True)}
+        % else:
+        ${users[0].address.on_one_line(bare=True)}
+        % endif
     - "respondent_name": ${other_parties[0].name.full(middle='full')}
     - "respondent_address": ${other_parties[0].address.on_one_line(bare=True)}
     - "respondent_birth_date": |
@@ -3642,7 +3722,7 @@ attachment:
         % elif filing_for_whom == "me":
         ${users[0].name.full(middle='full')}, ${users[0].address.on_one_line(bare=True)}
         % else:
-        ${users[1].name.full(middle='full')}, ${users[0].address.on_one_line(bare=True)}
+        ${users[1].name.full(middle='full')}, ${users[1].address.on_one_line(bare=True)}
         % endif
     - "safe_address": ${hide_address}
     - "respondent_name_and_address": |
@@ -3741,7 +3821,7 @@ attachment:
         % elif filing_for_whom == "me":
         ${users[0].name.full(middle='full')}, ${users[0].address.on_one_line(bare=True)}
         % else:
-        ${users[1].name.full(middle='full')}, ${users[0].address.on_one_line(bare=True)}
+        ${users[1].name.full(middle='full')}, ${users[1].address.on_one_line(bare=True)}
         % endif
     - "safe_address": ${hide_address}
     - "respondent_name_and_address": |
@@ -3975,16 +4055,21 @@ review:
     show if: users[0].has_email_address
   - Edit: hide_address
     button: |
-      **Do you want to keep your home address hidden?**
+      **${capitalize(do_does)} ${you_behalf} want to keep ${your_their} home address hidden?**
       ${word(yesno(hide_address))}
   - Edit: users[0].address.address
     button: |
-      % if hide_address:
+      % if hide_address or filing_for_whom != "me":
       **Your mailing address:**
       % else:
       **Your address:**
       % endif
       ${users[0].address.on_one_line(bare=True)}
+  - Edit: users[1].address.address
+    button: |
+      **${users[1].name.full(middle='full')}'s address:**
+      ${users[1].address.on_one_line(bare=True)}
+    show if: filing_for_whom != "me" and not hide_address
   - Edit: users[0].birthdate
     button: |
       **Your birth date:**
@@ -4148,26 +4233,6 @@ review:
       % else:
       ${other_parties[0].skin}
       % endif
-  - Edit: other_parties[0].has_alias
-    button: |
-      % if other_parties[0].has_alias:
-      **${other_parties[0].name.full(middle='full')} other names:**
-      ${other_parties[0].alias_names}
-      % elif other_parties[0].has_alias is None:
-      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
-      I don't know
-      % else:
-      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
-      No
-      % endif
-  - Edit: other_parties[0].ssn
-    button: |
-      **The last 4 digits of ${other_parties[0].name.full(middle='full')}'s Social Security Number:**
-      % if other_parties[0].ssn == "":
-      I don't know
-      % else:
-      ${other_parties[0].ssn}
-      % endif
   - Edit: knows_respondent_dob
     button: |
       **${other_parties[0].name.full(middle='full')}'s birth date:**
@@ -4218,6 +4283,26 @@ review:
       I don't know
       % else:
       ${other_parties[0].features}
+      % endif
+  - Edit: other_parties[0].has_alias
+    button: |
+      % if other_parties[0].has_alias:
+      **${other_parties[0].name.full(middle='full')} other names:**
+      ${other_parties[0].alias_names}
+      % elif other_parties[0].has_alias is None:
+      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
+      I don't know
+      % else:
+      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
+      No
+      % endif
+  - Edit: other_parties[0].ssn
+    button: |
+      **The last 4 digits of ${other_parties[0].name.full(middle='full')}'s Social Security Number:**
+      % if other_parties[0].ssn == "":
+      I don't know
+      % else:
+      ${other_parties[0].ssn}
       % endif
   - Edit: other_parties[0].drivers_license
     button: |
@@ -4983,16 +5068,21 @@ review:
   
   - Edit: hide_address
     button: |
-      **Do you want to keep your home address hidden?**
+      **${capitalize(do_does)} ${you_behalf} want to keep ${your_their} home address hidden?**
       ${word(yesno(hide_address))}
   - Edit: users[0].address.address
     button: |
-      % if hide_address:
+      % if hide_address or filing_for_whom != "me":
       **Your mailing address:**
       % else:
       **Your address:**
       % endif
       ${users[0].address.on_one_line(bare=True)}
+  - Edit: users[1].address.address
+    button: |
+      **${users[1].name.full(middle='full')}'s address:**
+      ${users[1].address.on_one_line(bare=True)}
+    show if: filing_for_whom != "me" and not hide_address
   - Edit: users[0].birthdate
     button: |
       **Your birth date:**
@@ -5263,26 +5353,6 @@ review:
       % else:
       ${other_parties[0].skin}
       % endif
-  - Edit: other_parties[0].has_alias
-    button: |
-      % if other_parties[0].has_alias:
-      **${other_parties[0].name.full(middle='full')} other names:**
-      ${other_parties[0].alias_names}
-      % elif other_parties[0].has_alias is None:
-      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
-      I don't know
-      % else:
-      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
-      No
-      % endif
-  - Edit: other_parties[0].ssn
-    button: |
-      **The last 4 digits of ${other_parties[0].name.full(middle='full')}'s Social Security Number:**
-      % if other_parties[0].ssn == "":
-      I don't know
-      % else:
-      ${other_parties[0].ssn}
-      % endif
   - Edit: knows_respondent_dob
     button: |
       **${other_parties[0].name.full(middle='full')}'s birth date:**
@@ -5333,6 +5403,26 @@ review:
       I don't know
       % else:
       ${other_parties[0].features}
+      % endif
+  - Edit: other_parties[0].has_alias
+    button: |
+      % if other_parties[0].has_alias:
+      **${other_parties[0].name.full(middle='full')} other names:**
+      ${other_parties[0].alias_names}
+      % elif other_parties[0].has_alias is None:
+      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
+      I don't know
+      % else:
+      **Has ${other_parties[0].name.full(middle='full')} gone by any other names?**
+      No
+      % endif
+  - Edit: other_parties[0].ssn
+    button: |
+      **The last 4 digits of ${other_parties[0].name.full(middle='full')}'s Social Security Number:**
+      % if other_parties[0].ssn == "":
+      I don't know
+      % else:
+      ${other_parties[0].ssn}
       % endif
   - Edit: other_parties[0].drivers_license
     button: |
