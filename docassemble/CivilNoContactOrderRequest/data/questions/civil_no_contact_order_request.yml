@@ -420,9 +420,8 @@ subquestion: |
 
   * Call 911 or local law enforcement (police).
   * Call a rape crisis hotline. To find the nearest center and call its 24-hour hotline, go to the [**Illinois Coalition Against Sexual Assault website**](https://icasa.org/) or call (217) 753-4117.  For Chicago, you can contact the Chicago Rape Crisis Hotline online at [**Resilience**](https://www.ourresilience.org/) or call (888) 293-2080.
-  * Call RAINN, a 24-hour national sexual assault hotline at (800) 656-HOPE (4673). There is also an [**online chat service**](https://hotline.rainn.org/online).
-  * Call 
   * Call or text the 988 Lifeline at 988.  There is also an [**online chat service**](https://chat.988lifeline.org/).
+  * Call RAINN, a 24-hour national sexual assault hotline at (800) 656-HOPE (4673). There is also an [**online chat service**](https://hotline.rainn.org/online).
 ---
 #replace the lengthy subquestion with a shorter summary and link to https://www.illinoislegalaid.org/legal-information/sexual-assault-and-civil-no-contact-orders-common-questions#whatissexualassault once the page is live
 id: experienced abuse
@@ -716,6 +715,9 @@ code: |
     have_has = "have"
     you_they = "you"
     your_behalf = "your"
+    know_knows = "know"
+    me_them = "me"
+    want_wants = "want"
   else:
     we_they = "they"
     i_they = "their"
@@ -731,13 +733,16 @@ code: |
     you_them = "them"
     your_their = "their"
     me_behalf = users[1].name.full(middle='full')
-    my_behalf = other_parties[0].name.full(middle='full')
-    my_behalf += " 's"
+    my_behalf = users[1].name.full(middle='full')
+    my_behalf += "'s"
     go_goes = "goes"
     have_has = "has"
     you_they = "they"
-    your_behalf = other_parties[0].name.full(middle='full')
+    your_behalf = users[1].name.full(middle='full')
     your_behalf += "'s"
+    know_knows = "knows"
+    me_them = "them"
+    want_wants = "wants"
 ---
 id: relationship
 question: |
@@ -1226,7 +1231,7 @@ question: |
 subquestion: |
   ${collapse_template(stay_away_contact)}
 fields:
-  - I want the court to order ${other_parties[0].name.full(middle='full')} to:: protection_requested
+  - ${capitalize(i_behalf)} ${want_wants} the court to order ${other_parties[0].name.full(middle='full')} to:: protection_requested
     datatype: checkboxes
     none of the above: True
     choices:
@@ -1289,11 +1294,11 @@ content: |
 ---
 id: protected place types
 question: |
-  What kinds of places do you want ${other_parties[0].name.full(middle='full')} to stay away from?
+  What kinds of places ${do_does} ${you_behalf} want ${other_parties[0].name.full(middle='full')} to stay away from?
 subquestion: |
-  **Caution:** You must tell ${other_parties[0].name.full(middle='full')} the address of any place you want them to stay away from. If you do not want ${other_parties[0].name.full(middle='full')} to know an address, you should not pick that location.
+  **Caution:** ${capitalize(you_behalf)} must tell ${other_parties[0].name.full(middle='full')} the address of any place ${you_they} ${want_wants} them to stay away from. If ${you_they} do not want ${other_parties[0].name.full(middle='full')} to know an address, ${you_they} should not pick that location.
 
-  If you want to include the name of a crisis center, click **Other**.
+  If ${you_they} want to include the name of a crisis center, click **Other**.
 fields:
   - no label: protected_place_types
     datatype: checkboxes
@@ -1309,9 +1314,9 @@ id: safe home address
 question: |
   What is ${your_behalf} home address?
 subquestion: |
-  You answered earlier that you want to hide ${your_their} real address.
+  You answered earlier that ${you_behalf} ${want_wants} to hide ${your_their} real address.
   
-  If you do not want ${other_parties[0].name.full(middle='full')} to know ${your_their} home address, do not list it here. You may want to click **Back** and not include ${your_their} home as a protected place.
+  If ${you_behalf} ${do_does} not want ${other_parties[0].name.full(middle='full')} to know ${your_their} home address, do not list it here. You may want to click **Back** and not include ${your_their} home as a protected place.
   
   The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
 fields:
@@ -1328,11 +1333,11 @@ fields:
 ---
 id: other places
 question: |
-  What other places do you want the court to order ${other_parties[0].name.full(middle='full')} to stay away from?
+  What other places ${do_does} ${you_behalf} want the court to order ${other_parties[0].name.full(middle='full')} to stay away from?
 subquestion: |
   For example, you could name a store ${you_behalf} ${go_goes} to regularly or a crisis center that is helping ${you_them}.
   
-  Include any addresses if you know them. If you do not want ${other_parties[0].name.full(middle='full')} to know the addresses, do not list them here.
+  Include any addresses if ${you_behalf} ${know_knows} them. If ${you_they} do not want ${other_parties[0].name.full(middle='full')} to know the addresses, do not list them here.
   
   The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
 fields:
@@ -1348,9 +1353,9 @@ fields:
 ---
 id: workplace name workplace address
 question: |
-  What is the name and address of the workplace you want ${other_parties[0].name.full(middle='full')} to stay away from?
+  What is the name and address of the workplace ${you_behalf} ${want_wants} ${other_parties[0].name.full(middle='full')} to stay away from?
 subquestion: |
-  If you do not want ${other_parties[0].name.full(middle='full')} to know this work address, do not list it here. You may want to click **Back** and not include a workplace as a protected place.
+  If ${you_behalf} ${do_does} not want ${other_parties[0].name.full(middle='full')} to know this work address, do not list it here. You may want to click **Back** and not include a workplace as a protected place.
   
   The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
 fields:
@@ -1369,9 +1374,9 @@ fields:
 ---
 id: school name school address
 question: |
-  What is the name and address of the school you want ${other_parties[0].name.full(middle='full')} to stay away from?
+  What is the name and address of the school ${you_behalf} want ${other_parties[0].name.full(middle='full')} to stay away from?
 subquestion: |
-  If you do not want ${other_parties[0].name.full(middle='full')} to know this school address, do not list it here. You may want to click **Back** and not include a school as a protected place.
+  If ${you_behalf} ${do_does} not want ${other_parties[0].name.full(middle='full')} to know this school address, do not list it here. You may want to click **Back** and not include a school as a protected place.
   
   The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
 fields:
@@ -1390,9 +1395,9 @@ fields:
 ---
 id: day care name day care address
 question: |
-  What is the name and address of the daycare you want ${other_parties[0].name.full(middle='full')} to stay away from?
+  What is the name and address of the daycare ${you_behalf} ${want_wants} ${other_parties[0].name.full(middle='full')} to stay away from?
 subquestion: |
-  If you do not want ${other_parties[0].name.full(middle='full')} to know this daycare address, do not list it here. You may want to click **Back** and not include a daycare as a protected place.
+  If ${you_behalf} ${do_does} not want ${other_parties[0].name.full(middle='full')} to know this daycare address, do not list it here. You may want to click **Back** and not include a daycare as a protected place.
   
   The address entered here will be printed on a form telling ${other_parties[0].name.full(middle='full')} where they cannot go.
 fields:
@@ -1418,7 +1423,7 @@ fields:
 ---
 id: prohibit school which school
 question: |
-  Do you want the court to prohibit ${other_parties[0].name.full(middle='full')} from attending the school ${you_behalf} ${go_goes} to?
+  ${capitalize(do_does)} ${you_behalf} want the court to prohibit ${other_parties[0].name.full(middle='full')} from attending the school ${you_behalf} ${go_goes} to?
 fields:
   - no label: prohibit_school
     datatype: yesnoradio
@@ -1454,11 +1459,11 @@ fields:
 ---
 id: perpetrator anything else
 question: |
-  Do you want the court to make ${other_parties[0].name.full(middle='full')} to do or stop doing anything else?
+  ${capitalize(do_does)} ${you_behalf} want the court to make ${other_parties[0].name.full(middle='full')} to do or stop doing anything else?
 fields: 
   - no label: other_parties[0].anything_else
     datatype: yesnoradio
-  - What do you want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
+  - What ${do_does} ${you_they} want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
     input type: area
     maxlength: 280
     rows: 9
@@ -1467,7 +1472,7 @@ fields:
         trial_court_index != -1
     js show if: |
       val('other_parties[0].anything_else') === true
-  - What do you want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
+  - What ${do_does} ${you_they} want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
     input type: area
     maxlength: 140
     rows: 5
@@ -2658,7 +2663,7 @@ id: get docs screen
 question: |
   Download
 subquestion: |    
-  Your forms are ready. View and download your forms below. Click **Make changes** to fix any mistakes.
+  Your forms are ready. View and download your forms below. Click **:edit: Make changes** to fix any mistakes.
 
   This program **does not file** your ${ form_name } forms with the court. You will need to do this yourself.
 
@@ -3932,6 +3937,13 @@ review:
     button: |
       **Your name:**
       ${users[0].name.full(middle='full')}
+  - Edit: 
+      - trial_court_index
+      - recompute:
+        - filing_county
+    button: |
+      **You are filing in:**
+      ${end_in_county(filing_county)}
   - Edit: filing_for_whom
     button: |
       **You are filing for:**
@@ -3951,13 +3963,6 @@ review:
     button: |  
       **Perpetrator's name:**
       ${other_parties[0].name.full(middle='full')}
-  - Edit: 
-      - trial_court_index
-      - recompute:
-        - filing_county
-    button: |
-      **You are filing in:**
-      ${end_in_county(filing_county)}
   - Edit: cook_district
     button: |
       **Which courthouse will you file in?**
@@ -4029,17 +4034,17 @@ review:
       % if protect_whom['adult']:
       * An adult who cannot file due to age, disablility or health
       % endif
-  - Edit: user_military
-    button: |
-        **Are you a service member of the Illinois National Guard or another reserve military component serving in Illinois?**
-        % if user_military and has_military_order:
-        Yes, and I have a Military Protective Order.
-        % elif user_military:
-        Yes, but I do not have a Military Protective Order.
-        % else:
-        No
-        % endif
-    show if: protect_whom['me']
+  #- Edit: user_military
+  #  button: |
+  #      **Are you a service member of the Illinois National Guard or another reserve military component serving in Illinois?**
+  #      % if user_military and has_military_order:
+  #      Yes, and I have a Military Protective Order.
+  #      % elif user_military:
+  #      Yes, but I do not have a Military Protective Order.
+  #      % else:
+  #      No
+  #      % endif
+  #  show if: protect_whom['me']
   - Edit: users[0].phone_number
     button: |
       **Your safe phone number:**
@@ -4059,7 +4064,9 @@ review:
       ${word(yesno(hide_address))}
   - Edit: users[0].address.address
     button: |
-      % if hide_address or filing_for_whom != "me":
+      % if filing_for_whom != "me" and hide_address:
+      **Mailing address:**
+      % elif hide_address:
       **Your mailing address:**
       % else:
       **Your address:**
@@ -4079,7 +4086,6 @@ review:
       **Do you want to protect anyone else with the CNCO?**
       ${word(yesno(others_protected.there_are_any))}
     show if: filing_for_whom == "me"
-    #show if: protect_whom['minor'] == False and protect_whom['adult'] == False
   - Edit: others_protected.revisit
     button: |
       **Others to protect: (Edit to change names, addresses, and other information)**
@@ -4685,7 +4691,7 @@ subquestion: |
 review:
   - Edit: order_type
     button: |
-      **What type of CNCO do you want?**
+      **What type of CNCO ${do_does} ${you_behalf} want?**
       % if order_type['plenary'] and order_type['emergency']:
       Plenary Civil No Contact Order and Emergency Civil No Contact Order
       % elif order_type['plenary']:
@@ -4702,30 +4708,30 @@ review:
     show if: order_type['emergency'] and trial_court.address.county.lower() == "cook"
   - Edit: protection_requested
     button: |
-      **What do you want ${other_parties[0].name.full(middle='full')} to do?**
+      **What ${do_does} ${you_behalf} want ${other_parties[0].name.full(middle='full')} to do?**
       
       % if protection_requested['away_people']:
-      * Stay away from me and others
+      * Stay away from ${me_them} and others
       % endif
       % if protection_requested['no_contact']:
-      * Stop contacting me and others whether in person, by phone, by e-mail, by note, or by sending messages through other people
+      * Stop contacting ${me_them} and others whether in person, by phone, by e-mail, by note, or by sending messages through other people
       % endif
       % if protection_requested['away_places']:
       * Stay away from the locations of the survivor, survivor's family and household member's work or school
       % endif
       % if protection_requested['away_property']:
-      * Stay away from my pets and property
+      * Stay away from ${my_their} pets and property
       % endif
     show if: trial_court_index == -1
   - Edit: protection_requested
     button: |
-      **What do you want ${other_parties[0].name.full(middle='full')} to do?**
+      **What ${do_does} ${you_behalf} want ${other_parties[0].name.full(middle='full')} to do?**
       
       % if protection_requested['away_people']:
-      * Stay away from me and others, and not take, hide, or damage any of my property or pets
+      * Stay away from ${me_them} and others, and not take, hide, or damage any of ${my_their} property or pets
       % endif
       % if protection_requested['no_contact']:
-      * Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people
+      * Stop contacting ${me_them} and others whether in person, by phone, by e-mail, by note or by sending messages through other people
       % endif
       % if protection_requested['away_places']:
       * Stay away from the locations of the survivor, survivor's family and household member's home, work, school, or daycare
@@ -4748,7 +4754,7 @@ review:
     show if: protection_requested['away_places'] and trial_court_index == -1
   - Edit: protected_place_types
     button: |
-      **What kinds of places do you want ${other_parties[0].name.full(middle='full')} to stay away from?**
+      **What kinds of places ${do_does} ${you_behalf} want ${other_parties[0].name.full(middle='full')} to stay away from?**
       
       % if protected_place_types['Home']:
       * Home
@@ -4768,12 +4774,12 @@ review:
     show if: protection_requested['away_places']
   - Edit: home.address
     button: |
-      **Your home address:**
+      **${capitalize(your_behalf)} home address:**
       ${home.on_one_line(bare=True)}
     show if: protection_requested['away_places'] and protected_place_types['Home'] and hide_address
   - Edit: users[0].address
     button: |
-      **Your home address:**
+      **${capitalize(your_behalf)} home address:**
       ${users[0].address.on_one_line(bare=True)}
     show if: protection_requested['away_places'] and protected_place_types['Home'] and not hide_address
   - Edit: protected_workplace.name
@@ -4793,19 +4799,19 @@ review:
     show if: protection_requested['away_places'] and protected_place_types['day_care']
   - Edit: other_places
     button: |
-      **What other places do you want ${other_parties[0].name.full(middle='full')} to stay away from?**
+      **What other places ${do_does} ${you_behalf} want ${other_parties[0].name.full(middle='full')} to stay away from?**
       ${other_places}
     show if: protection_requested['away_places'] and protected_place_types['Other']
   - Edit: same_school
     button: |
-      **Do you and ${other_parties[0].name.full(middle='full')} go to the same school?**
+      **Do ${you_behalf} and ${other_parties[0].name.full(middle='full')} go to the same school?**
       ${word(yesno(same_school))}
     show if: trial_court_index != -1 and protection_requested['away_places'] and protected_place_types['School']
   - Edit: prohibit_school
     button: |
-      **What school do you want the court to prohibit ${other_parties[0].name.full(middle='full')} from attending?**
+      **What school ${do_does} ${you_behalf} want the court to prohibit ${other_parties[0].name.full(middle='full')} from attending?**
       % if not prohibit_school:
-      I do not want to prohibit ${other_parties[0].name.full(middle='full')} from attending any school.
+      ${capitalize(i_they)} do not want to prohibit ${other_parties[0].name.full(middle='full')} from attending any school.
       % elif which_school == "protected_school":
       ${protected_school.name}, ${protected_school.on_one_line(bare=True)}
       % else:
@@ -4836,11 +4842,11 @@ review:
     show if: trial_court_index != -1 and protected_place_types['School'] and same_school and prohibit_school and protection_requested['away_places'] and (knows_respondent_dob != "exact" or other_parties[0].age_in_years() < 18) and parents_or_guardians != "none"
   - Edit: other_parties[0].anything_else
     button: |
-      **Do you want the court to make ${other_parties[0].name.full(middle='full')} to do or stop doing anything else?**
+      **${capitalize(do_does)} ${you_behalf} want the court to make ${other_parties[0].name.full(middle='full')} to do or stop doing anything else?**
       ${word(yesno(other_parties[0].anything_else))}
   - Edit: other_parties[0].what_else
     button: |
-      **What do you want ${other_parties[0].name.full(middle='full')} to do or stop doing?**
+      **What ${do_does} ${you_behalf} want ${other_parties[0].name.full(middle='full')} to do or stop doing?**
       ${other_parties[0].what_else}
     show if: other_parties[0].anything_else
 ---
@@ -5065,14 +5071,15 @@ review:
       **Your email address:**
       ${users[0].email}
     show if: users[0].has_email_address
-  
   - Edit: hide_address
     button: |
       **${capitalize(do_does)} ${you_behalf} want to keep ${your_their} home address hidden?**
       ${word(yesno(hide_address))}
   - Edit: users[0].address.address
     button: |
-      % if hide_address or filing_for_whom != "me":
+      % if filing_for_whom != "me" and hide_address:
+      **Mailing address:**
+      % elif hide_address:
       **Your mailing address:**
       % else:
       **Your address:**
@@ -5127,7 +5134,7 @@ review:
       <h4>Protections</h4>
   - Edit: order_type
     button: |
-      **What type of CNCO do you want?**
+      **What type of CNCO ${do_does} ${you_behalf} want?**
       % if order_type['plenary'] and order_type['emergency']:
       Plenary Civil No Contact Order and Emergency Civil No Contact Order
       % elif order_type['plenary']:
@@ -5144,30 +5151,30 @@ review:
     show if: order_type['emergency'] and trial_court.address.county.lower() == "cook"
   - Edit: protection_requested
     button: |
-      **What do you want ${other_parties[0].name.full(middle='full')} to do?**
+      **What ${do_does} ${you_behalf} want ${other_parties[0].name.full(middle='full')} to do?**
       
       % if protection_requested['away_people']:
-      * Stay away from me and others
+      * Stay away from ${me_them} and others
       % endif
       % if protection_requested['no_contact']:
-      * Stop contacting me and others whether in person, by phone, by e-mail, by note, or by sending messages through other people
+      * Stop contacting ${me_them} and others whether in person, by phone, by e-mail, by note, or by sending messages through other people
       % endif
       % if protection_requested['away_places']:
       * Stay away from the locations of the survivor, survivor's family and household member's work or school
       % endif
       % if protection_requested['away_property']:
-      * Stay away from my pets and property
+      * Stay away from ${my_their} pets and property
       % endif
     show if: trial_court_index == -1
   - Edit: protection_requested
     button: |
-      **What do you want ${other_parties[0].name.full(middle='full')} to do?**
+      **What ${do_does} ${you_behalf} want ${other_parties[0].name.full(middle='full')} to do?**
       
       % if protection_requested['away_people']:
-      * Stay away from me and others, and not take, hide, or damage any of my property or pets
+      * Stay away from ${me_them} and others, and not take, hide, or damage any of ${my_their} property or pets
       % endif
       % if protection_requested['no_contact']:
-      * Stop contacting me and others whether in person, by phone, by e-mail, by note or by sending messages through other people
+      * Stop contacting ${me_them} and others whether in person, by phone, by e-mail, by note or by sending messages through other people
       % endif
       % if protection_requested['away_places']:
       * Stay away from the locations of the survivor, survivor's family and household member's home, work, school, or daycare
@@ -5190,7 +5197,7 @@ review:
     show if: protection_requested['away_places'] and trial_court_index == -1
   - Edit: protected_place_types
     button: |
-      **What kinds of places do you want ${other_parties[0].name.full(middle='full')} to stay away from?**
+      **What kinds of places ${do_does} ${you_behalf} want ${other_parties[0].name.full(middle='full')} to stay away from?**
       
       % if protected_place_types['Home']:
       * Home
@@ -5210,12 +5217,12 @@ review:
     show if: protection_requested['away_places']
   - Edit: home.address
     button: |
-      **Your home address:**
+      **${capitalize(your_behalf)} home address:**
       ${home.on_one_line(bare=True)}
     show if: protection_requested['away_places'] and protected_place_types['Home'] and hide_address
   - Edit: users[0].address
     button: |
-      **Your home address:**
+      **${capitalize(your_behalf)} home address:**
       ${users[0].address.on_one_line(bare=True)}
     show if: protection_requested['away_places'] and protected_place_types['Home'] and not hide_address
   - Edit: protected_workplace.name
@@ -5235,19 +5242,19 @@ review:
     show if: protection_requested['away_places'] and protected_place_types['day_care']
   - Edit: other_places
     button: |
-      **What other places do you want ${other_parties[0].name.full(middle='full')} to stay away from?**
+      **What other places ${do_does} ${you_behalf} want ${other_parties[0].name.full(middle='full')} to stay away from?**
       ${other_places}
     show if: protection_requested['away_places'] and protected_place_types['Other']
   - Edit: same_school
     button: |
-      **Do you and ${other_parties[0].name.full(middle='full')} go to the same school?**
+      **Do ${you_behalf} and ${other_parties[0].name.full(middle='full')} go to the same school?**
       ${word(yesno(same_school))}
     show if: trial_court_index != -1 and protection_requested['away_places'] and protected_place_types['School']
   - Edit: prohibit_school
     button: |
-      **What school do you want the court to prohibit ${other_parties[0].name.full(middle='full')} from attending?**
+      **What school ${do_does} ${you_behalf} want the court to prohibit ${other_parties[0].name.full(middle='full')} from attending?**
       % if not prohibit_school:
-      I do not want to prohibit ${other_parties[0].name.full(middle='full')} from attending any school.
+      ${capitalize(i_they)} do not want to prohibit ${other_parties[0].name.full(middle='full')} from attending any school.
       % elif which_school == "protected_school":
       ${protected_school.name}, ${protected_school.on_one_line(bare=True)}
       % else:
@@ -5278,11 +5285,11 @@ review:
     show if: trial_court_index != -1 and protected_place_types['School'] and same_school and prohibit_school and protection_requested['away_places'] and (knows_respondent_dob != "exact" or other_parties[0].age_in_years() < 18) and parents_or_guardians != "none"
   - Edit: other_parties[0].anything_else
     button: |
-      **Do you want the court to make ${other_parties[0].name.full(middle='full')} to do or stop doing anything else?**
+      **${capitalize(do_does)} ${you_behalf} want the court to make ${other_parties[0].name.full(middle='full')} to do or stop doing anything else?**
       ${word(yesno(other_parties[0].anything_else))}
   - Edit: other_parties[0].what_else
     button: |
-      **What do you want ${other_parties[0].name.full(middle='full')} to do or stop doing?**
+      **What ${do_does} ${you_behalf} want ${other_parties[0].name.full(middle='full')} to do or stop doing?**
       ${other_parties[0].what_else}
     show if: other_parties[0].anything_else
   - note: |
