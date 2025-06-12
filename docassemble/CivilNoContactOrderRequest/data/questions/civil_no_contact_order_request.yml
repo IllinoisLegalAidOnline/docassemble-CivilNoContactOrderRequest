@@ -907,15 +907,17 @@ depends on:
 code: |
   if hide_address:
     home.address
-  else:
+  elif filing_for_whom == "me":
     home = users[0].address
+  else:
+    home = users[1].address
   run_home_address_block = True
 ---
 id: user birthdate
 question: |
-  When ${were_was} ${you_behalf} born?
+  When were you born?
 fields:
-  - ${your_behalf} date of birth: users[0].birthdate
+  - Date of birth: users[0].birthdate
     datatype: BirthDate
     alMax: today()
 ---
@@ -4064,9 +4066,7 @@ review:
       ${word(yesno(hide_address))}
   - Edit: users[0].address.address
     button: |
-      % if filing_for_whom != "me" and hide_address:
-      **Mailing address:**
-      % elif hide_address:
+      % if hide_address:
       **Your mailing address:**
       % else:
       **Your address:**
@@ -4744,7 +4744,7 @@ review:
     show if: protection_requested['away_places'] and trial_court_index != -1
   - Edit: distance_people
     button: |
-      **How far should ${other_parties[0].name.full(middle='full')} stay away from you and others?**
+      **How far should ${other_parties[0].name.full(middle='full')} stay away from ${you_behalf} and others?**
       ${distance_people} feet
     show if: protection_requested['away_people'] and trial_court_index == -1
   - Edit: distance_places
@@ -5077,9 +5077,7 @@ review:
       ${word(yesno(hide_address))}
   - Edit: users[0].address.address
     button: |
-      % if filing_for_whom != "me" and hide_address:
-      **Mailing address:**
-      % elif hide_address:
+      % if hide_address:
       **Your mailing address:**
       % else:
       **Your address:**
@@ -5187,7 +5185,7 @@ review:
     show if: protection_requested['away_places'] and trial_court_index != -1
   - Edit: distance_people
     button: |
-      **How far should ${other_parties[0].name.full(middle='full')} stay away from you and others?**
+      **How far should ${other_parties[0].name.full(middle='full')} stay away from ${you_behalf} and others?**
       ${distance_people} feet
     show if: protection_requested['away_people'] and trial_court_index == -1
   - Edit: distance_places
