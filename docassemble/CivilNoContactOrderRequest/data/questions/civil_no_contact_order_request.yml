@@ -1465,7 +1465,7 @@ question: |
 fields: 
   - no label: other_parties[0].anything_else
     datatype: yesnoradio
-  - What ${do_does} ${you_they} want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
+  - What do ${you_they} want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
     input type: area
     maxlength: 280
     rows: 9
@@ -1474,7 +1474,7 @@ fields:
         trial_court_index != -1
     js show if: |
       val('other_parties[0].anything_else') === true
-  - What ${do_does} ${you_they} want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
+  - What do ${you_they} want ${other_parties[0].name.full(middle='full')} to do or stop doing?: other_parties[0].what_else
     input type: area
     maxlength: 140
     rows: 5
