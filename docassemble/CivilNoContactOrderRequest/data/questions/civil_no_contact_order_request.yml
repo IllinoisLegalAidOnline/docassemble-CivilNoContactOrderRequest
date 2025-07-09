@@ -26,7 +26,7 @@ objects:
   - abusive_acts: DAList.using(object_type=Thing, there_are_any=True, complete_attribute='complete')
   - home: ALAddress
   - report_numbers: DAList.using(object_type=Thing, there_are_any=False)
-  #- others_with_minor_initials: ALPeopleList.using(there_are_any=False)
+  - others_with_minor_initials: ALPeopleList.using(there_are_any=False)
   - away_address_list: DAList.using(object_type=ALAddress, there_are_any=False)
   - no_remain_address_list: DAList.using(object_type=ALAddress, there_are_any=False)
   - school_list: DAList.using(object_type=ALAddress, there_are_any=False)
@@ -224,6 +224,7 @@ code: |
   pop_protected_code  
   forms_assembling
   addendum_check
+  with_initials
   #adult_minor_sorting
   snapshot_forms
   set_progress(100)
@@ -382,7 +383,7 @@ continue button field: cnco_explainer
 question: |
   About Civil No Contact Orders
 subquestion: |
-  A Civil No Contact Order (CNCO) is a protective order protects survivors of sexual assault, or sexual abuse from the perpetrator. The Order can also be used to protect the survivor's family and rape crisis center workers. 
+  A Civil No Contact Order (CNCO) is a protective order that protects survivors of sexual assault, or sexual abuse from the perpetrator. The Order can also be used to protect the survivor's family and rape crisis center workers. 
 
   If you want to know what type of protective order is best for you, use ILAO's [**Which protective order is right for me?**](https://www.illinoislegalaid.org/legal-information/which-protective-order-right-me) tool to learn more.
 
@@ -440,7 +441,7 @@ template: assault_conduct_define
 subject: |
   **Definitions of sexual assault and non-consensual sexual conduct**
 content: |
-  In Illinois, **sexual assault** occurs when a person does non-consensual sexual conduct or non-consensual sexual penetration. In some cases it can be called **rape**.
+  In Illinois, **sexual assault** occurs when a person experiences non-consensual sexual conduct or non-consensual sexual penetration. In some cases it can be called **rape**.
 
   **Sexual conduct** can be:
 
@@ -707,7 +708,7 @@ code: |
     you_behalf = "you"
     were_was = "were"
     do_does = "do"
-    you_them = "you_them"
+    you_them = "you"
     your_their = "your"
     me_behalf = "me"
     my_behalf = "my"
@@ -756,7 +757,7 @@ fields:
     datatype: checkboxes
     none of the above: False
     choices:
-      - ${capitalize(we_they)} are not related.: unrelated
+      - ${capitalize(we_they)} are not related and ${we_they} have not been in a relationship.: unrelated
       - ${capitalize(we_they)} dated.: dated
       - ${capitalize(we_they)} are related through current or past marriage. For example, ${i_behalf} ${am_is} ${their_respondents} spouse, ex-spouse, in-law, step-child, or other relative.: marriage
       - ${capitalize(we_they)} have children together.: children
@@ -768,7 +769,7 @@ fields:
 validation code: |
     if user_relationship['unrelated']:
       if user_relationship['dated'] or user_relationship['marriage'] or user_relationship['children'] or user_relationship['blood'] or user_relationship['blood_child'] or user_relationship['adopt_child'] or user_relationship['caregiver']:
-        validation_error("If you have any of the listed relationships with the person you are filing against, you should not select the 'We are not related.'")
+        validation_error("If you have any of the listed relationships with the person you are filing against, you should not select 'We are not related.'")
 ---
 id: related note
 continue button field: related_note
@@ -1285,6 +1286,7 @@ fields:
 on change: 
   trial_court_index: |
     undefine('protection_requested')
+    undefine('other_parties[0].license_plate')
 ---
 template: stay_away_contact
 subject: |
@@ -1944,33 +1946,58 @@ fields:
 ---
 id: perpetrator vehicle details
 question: |
+  % if trial_court_index == -1:
   Enter as much information as you can about ${other_parties[0].name.full(middle='full')}'s vehicle.
+  % else:
+  What is the license plate number of ${other_parties[0].name.full(middle='full')}'s vehicle?
+  % endif
 subquestion: |
+  % if trial_court_index == -1:
   If ${other_parties[0].name.full(middle='full')} has more than one car, describe the car they use most often.
 
   If you do not know the answer to something, you can leave it blank.
+  % else:
+  If ${other_parties[0].name.full(middle='full')} has more than one car, list the plate number of the car they use most often.
+
+  If you do not know the answer, you can leave this blank.
+  % endif
 fields:
   - Year: other_parties[0].vehicle_year
     required: False
     maxlength: 4
+    show if: 
+      code: |
+        trial_court_index == -1
   - Make: other_parties[0].vehicle_make
     required: False
     maxlength: 30
+    show if: 
+      code: |
+        trial_court_index == -1
     help: |
       This is the brand that made the vehicle. For example, Ford, Chevy, and Toyota are all makes.
   - Model: other_parties[0].vehicle_model
     required: False
     maxlength: 30
+    show if: 
+      code: |
+        trial_court_index == -1
     help: |
       This is the vehicle's type. For example, Explorer, Suburban, and Camry are all models.
   - Color: other_parties[0].vehicle_color
     maxlength: 30
     required: False
+    show if: 
+      code: |
+        trial_court_index == -1
   - License plate number: other_parties[0].license_plate
     maxlength: 10
     required: False
   - State: other_parties[0].vehicle_state
     required: False
+    show if: 
+      code: |
+        trial_court_index == -1
     code: |
       states_list()
 ---
@@ -2452,7 +2479,7 @@ id: perpetrator which address
 question: |
   Where should court papers be delivered to ${other_parties[0].name.full(middle='full')}?
 subquestion: |
-  The court will need an address where they can deliver the court forms to ${other_parties[0].name.full(middle='full')}. If necessary, you could try an Internet search to find one. You can ask for a CNCO without knowing their address, but that may make it harder to get the cnco.
+  The court will need an address where they can deliver the court forms to ${other_parties[0].name.full(middle='full')}. If necessary, you could try an Internet search to find one. You can ask for a CNCO without knowing their address, but that may make it harder to get the CNCO.
 fields: 
   - no label: other_parties[0].which_address
     input type: radio
@@ -2660,6 +2687,23 @@ code: |
       else:
         event.include_in_addendum = False
   addendum_check = True
+---
+reconsider: True
+code: |
+  if others_protected.there_are_any and others_protected.number_gathered() > 0:
+    others_with_minor_initials.clear()
+    for index, other in enumerate(others_protected):
+      
+  
+      if others_protected[index].is_minor:
+        #I append append an object here and set its name to the "other"'s name because if I just appended the "other" editing the "others_with_minor_initial[index]"'s name would also edit the "other"'s name.
+        others_with_minor_initials.appendObject(ALIndividual)
+        others_with_minor_initials[index].name.first = other.name.first[:1]
+        others_with_minor_initials[index].name.last = other.name.last[:1]
+      else:
+        others_with_minor_initials.append(other)
+    others_with_minor_initials.there_is_another = False
+  with_initials = True
 ---
 id: get docs screen
 question: |
@@ -3425,16 +3469,16 @@ attachment:
     - "police_report_1": ${abusive_acts[0].police_number if abusive_acts[0].police_check else ""}
     - "others_protected_list": |     
         % if others_protected.there_are_any and filing_for_whom != "me":
-        ${others_protected.full_names()}
+        ${others_with_minor_initials.full_names()}
         % elif filing_for_whom == "me" and not others_protected.there_are_any:
         ${users[0].name.full(middle='full')}
         % elif others_protected.there_are_any and filing_for_whom == "me":
         % if others_protected.number_gathered() == 1:
-        ${users[0].name.full(middle='full')} and ${others_protected.full_names()}
+        ${users[0].name.full(middle='full')} and ${others_with_minor_initials.full_names()}
         % elif others_protected.number_gathered() == 0:
         ${users[0].name.full(middle='full')}
         % else:
-        ${users[0].name.full(middle='full')}, ${others_protected.full_names()}
+        ${users[0].name.full(middle='full')}, ${others_with_minor_initials.full_names()}
         % endif
         % endif
     - "away_people": ${protection_requested['away_people']}
@@ -4259,13 +4303,13 @@ review:
       **${other_parties[0].name.full(middle='full')}'s height and weight:**
       % if other_parties[0].height_feet != "" and other_parties[0].height_inches != "":
       % if other_parties[0].weight != "":
-      ${other_parties[0].height_feet} feet ${other_parties[0].height_inches} inches, ${other_parties.weight} pounds
+      ${other_parties[0].height_feet} feet ${other_parties[0].height_inches} inches, ${other_parties[0].weight} pounds
       % else:
       ${other_parties[0].height_feet} feet ${other_parties[0].height_inches} inches
       % endif
       % else:
       % if other_parties[0].weight != "":
-      ${other_parties.weight} pounds
+      ${other_parties[0].weight} pounds
       % else:
       I don't know
       % endif
@@ -4328,14 +4372,15 @@ review:
       % endif
   - Edit: other_parties[0].license_plate
     button: |
+      % if trial_court_index == -1:
       **${other_parties[0].name.full(middle='full')}'s vehicle information:**
       
       % if other_parties[0].vehicle_year == "":
       * Year: I don't know
       % else:
-      * Year: %{other_parties[0].vehicle_year}
+      * Year: ${other_parties[0].vehicle_year}
       % endif
-      % if other_parties.vehicle_make == "":
+      % if other_parties[0].vehicle_make == "":
       * Make: I don't know
       % else:
       * Make: ${other_parties[0].vehicle_make}
@@ -4345,7 +4390,7 @@ review:
       % else:
       * Model: ${other_parties[0].vehicle_model}
       % endif
-      % if other_parties.vehicle_cololr == "":
+      % if other_parties[0].vehicle_color == "":
       * Color: I don't know
       % else:
       * Color: ${other_parties[0].vehicle_color}
@@ -4359,6 +4404,10 @@ review:
       * State: I don't know
       % else:
       * State: ${other_parties[0].vehicle_state}
+      % endif
+      % else:
+      **${other_parties[0].name.full(middle='full')}'s license plate number:**
+      ${other_parties[0].license_plate}
       % endif
     show if: other_parties[0].has_vehicle
   - Edit: other_parties[0].another_number_check
@@ -5378,13 +5427,13 @@ review:
       **${other_parties[0].name.full(middle='full')}'s height and weight:**
       % if other_parties[0].height_feet != "" and other_parties[0].height_inches != "":
       % if other_parties[0].weight != "":
-      ${other_parties[0].height_feet} feet ${other_parties[0].height_inches} inches, ${other_parties.weight} pounds
+      ${other_parties[0].height_feet} feet ${other_parties[0].height_inches} inches, ${other_parties[0].weight} pounds
       % else:
       ${other_parties[0].height_feet} feet ${other_parties[0].height_inches} inches
       % endif
       % else:
       % if other_parties[0].weight != "":
-      ${other_parties.weight} pounds
+      ${other_parties[0].weight} pounds
       % else:
       I don't know
       % endif
@@ -5447,14 +5496,15 @@ review:
       % endif
   - Edit: other_parties[0].license_plate
     button: |
+      % if trial_court_index == -1:
       **${other_parties[0].name.full(middle='full')}'s vehicle information:**
       
       % if other_parties[0].vehicle_year == "":
       * Year: I don't know
       % else:
-      * Year: %{other_parties[0].vehicle_year}
+      * Year: ${other_parties[0].vehicle_year}
       % endif
-      % if other_parties.vehicle_make == "":
+      % if other_parties[0].vehicle_make == "":
       * Make: I don't know
       % else:
       * Make: ${other_parties[0].vehicle_make}
@@ -5464,7 +5514,7 @@ review:
       % else:
       * Model: ${other_parties[0].vehicle_model}
       % endif
-      % if other_parties.vehicle_cololr == "":
+      % if other_parties[0].vehicle_color == "":
       * Color: I don't know
       % else:
       * Color: ${other_parties[0].vehicle_color}
@@ -5478,6 +5528,10 @@ review:
       * State: I don't know
       % else:
       * State: ${other_parties[0].vehicle_state}
+      % endif
+      % else:
+      **${other_parties[0].name.full(middle='full')}'s license plate number:**
+      ${other_parties[0].license_plate}
       % endif
     show if: other_parties[0].has_vehicle
   - Edit: other_parties[0].another_number_check
