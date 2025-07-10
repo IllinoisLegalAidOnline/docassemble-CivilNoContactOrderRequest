@@ -441,7 +441,7 @@ template: assault_conduct_define
 subject: |
   **Definitions of sexual assault and non-consensual sexual conduct**
 content: |
-  In Illinois, **sexual assault** occurs when a person experiences non-consensual sexual conduct or non-consensual sexual penetration. In some cases it can be called **rape**.
+  In Illinois, **sexual assault** occurs when a person commits non-consensual sexual conduct or non-consensual sexual penetration. In some cases it can be called **rape**.
 
   **Sexual conduct** can be:
 
@@ -613,26 +613,26 @@ question: |
 subquestion: |
   This program allows you to make forms to ask for a CNCO for someone else. You should answer the following questions from the point of view of ${users[1].name.full(middle='full')}.
 ---
-id: protect whom
-question: |
-  Who do you want this Civil No Contact Order to protect?
-subquestion: |
-  You can file for a member of your family or your household so long as you have their consent.
-  
-  You can file for minor children or high-risk adults who can't file for themselves. You do not need to be related to them.
-  
-  Check all that apply.
-fields:
-  - no label: protect_whom
-    datatype: checkboxes
-    none of the above: False
-    choices:
-      - Myself: me
-      - A minor child: minor
-      - An adult who cannot file due to age, disablility or health: adult
-validation code: |
-  if protect_whom.all_false():
-    validation_error("You need to pick someone to protect.")
+#id: protect whom
+#question: |
+#  Who do you want this Civil No Contact Order to protect?
+#subquestion: |
+#  You can file for a member of your family or your household so long as you have their consent.
+#  
+#  You can file for minor children or high-risk adults who can't file for themselves. You do not need to be related to them.
+#  
+#  Check all that apply.
+#fields:
+#  - no label: 
+#    datatype: checkboxes
+#    none of the above: False
+#    choices:
+#      - Myself: me
+#      - A minor child: minor
+#      - An adult who cannot file due to age, disablility or health: adult
+#validation code: |
+#  if protect_whom.all_false():
+#    validation_error("You need to pick someone to protect.")
 ---
 #depends on:
 #  - protect_whom["minor"]
@@ -769,7 +769,10 @@ fields:
 validation code: |
     if user_relationship['unrelated']:
       if user_relationship['dated'] or user_relationship['marriage'] or user_relationship['children'] or user_relationship['blood'] or user_relationship['blood_child'] or user_relationship['adopt_child'] or user_relationship['caregiver']:
-        validation_error("If you have any of the listed relationships with the person you are filing against, you should not select 'We are not related.'")
+        if filing_for_whom == "me":
+          validation_error("If you have any of the listed relationships with the person you are filing against, you should not select 'We are not related and we have not been in a relationship.'")
+        else:
+          validation_error("If they have any of the listed relationships with the person they are filing against, you should not select 'They are not related and they have not been in a relationship.'")
 ---
 id: related note
 continue button field: related_note
@@ -1008,21 +1011,6 @@ question: |
 fields:
   - no label: others_protected[i].is_minor
     datatype: yesnoradio
----
-on change: 
-  protect_whom['minor']: |
-    undefine('protect_whom_sets_there_are_any')
-    if others_protected.number_gathered() == 0:
-      undefine('others_protected.there_are_any')
-  protect_whom['adult']: |
-    undefine('protect_whom_sets_there_are_any')
-    if others_protected.number_gathered() == 0:
-      undefine('others_protected.there_are_any')
----
-code: |
-  if protect_whom['minor'] or protect_whom['adult']:
-    others_protected.there_are_any = True
-  protect_whom_sets_there_are_any = True
 ---
 on change:
   filing_for_whom: |
@@ -2576,13 +2564,20 @@ reconsider: True
 code: |
   any_minors = False
   any_adults = False
-  if others_protected.there_are_any:
-    if others_protected.number_gathered() > 0:
-      for other in others_protected:
-        if other.is_minor:
-          any_minors = True
-        else:
-          any_adults = True
+  if filing_for_whom == "me":
+    if others_protected.there_are_any:
+      if others_protected.number_gathered() > 0:
+        for other in others_protected:
+          if other.is_minor:
+            any_minors = True
+          else:
+            any_adults = True
+  elif filing_for_whom == "child":
+    any_minors = True
+    any_adults = False
+  elif filing_for_whom == "adult":
+    any_minors = False
+    any_adults = True
   check_ages = True
 ---
 reconsider: True
@@ -2690,25 +2685,35 @@ code: |
 ---
 reconsider: True
 code: |
-  if others_protected.there_are_any and others_protected.number_gathered() > 0:
-    others_with_minor_initials.clear()
-    for index, other in enumerate(others_protected):
-      
-  
-      if others_protected[index].is_minor:
-        #I append append an object here and set its name to the "other"'s name because if I just appended the "other" editing the "others_with_minor_initial[index]"'s name would also edit the "other"'s name.
-        others_with_minor_initials.appendObject(ALIndividual)
-        others_with_minor_initials[index].name.first = other.name.first[:1]
-        others_with_minor_initials[index].name.last = other.name.last[:1]
-      else:
-        others_with_minor_initials.append(other)
+  others_with_minor_initials.clear()
+  if filing_for_whom == "me":
+    if others_protected.there_are_any and others_protected.number_gathered() > 0:
+      others_with_minor_initials.clear()
+      for index, other in enumerate(others_protected):
+        
+    
+        if others_protected[index].is_minor:
+          #I append append an object here and set its name to the "other"'s name because if I just appended the "other" editing the "others_with_minor_initial[index]"'s name would also edit the "other"'s name.
+          others_with_minor_initials.appendObject(ALIndividual)
+          others_with_minor_initials[index].name.first = other.name.first[:1]
+          others_with_minor_initials[index].name.last = other.name.last[:1]
+        else:
+          others_with_minor_initials.append(other)
+      others_with_minor_initials.there_is_another = False
+  else: 
+    if filing_for_whom == "child":
+      others_with_minor_initials.appendObject(ALIndividual)
+      others_with_minor_initials[0].name.first = users[1].name.first[:1]
+      others_with_minor_initials[0].name.last = users[1].name.last[:1]
+    else:
+      others_with_minor_initials.append(users[1])
     others_with_minor_initials.there_is_another = False
   with_initials = True
 ---
 id: get docs screen
 question: |
   Download
-subquestion: |    
+subquestion: |     
   Your forms are ready. View and download your forms below. Click **:edit: Make changes** to fix any mistakes.
 
   This program **does not file** your ${ form_name } forms with the court. You will need to do this yourself.
@@ -3467,8 +3472,10 @@ attachment:
         % endif
     - "no_police_report": ${ False if  abusive_acts[0].police_check else True}
     - "police_report_1": ${abusive_acts[0].police_number if abusive_acts[0].police_check else ""}
-    - "others_protected_list": |     
-        % if others_protected.there_are_any and filing_for_whom != "me":
+    - "others_protected_list": | 
+        % if filing_for_whom != "me":
+        ${others_with_minor_initials.full_names()}
+        % elif others_protected.there_are_any and filing_for_whom != "me":
         ${others_with_minor_initials.full_names()}
         % elif filing_for_whom == "me" and not others_protected.there_are_any:
         ${users[0].name.full(middle='full')}
@@ -4067,19 +4074,6 @@ review:
       **Who are you filing on behalf of?**
       ${users[1].name.full(middle='full')}
     show if: filing_for_whom != "me"
-  - Edit: protect_whom
-    button: |
-      **Who do you want to protect?**
-      
-      % if protect_whom['me']:
-      * Myself
-      % endif
-      % if protect_whom['minor']:
-      * A minor child
-      % endif
-      % if protect_whom['adult']:
-      * An adult who cannot file due to age, disablility or health
-      % endif
   #- Edit: user_military
   #  button: |
   #      **Are you a service member of the Illinois National Guard or another reserve military component serving in Illinois?**
@@ -5077,30 +5071,17 @@ review:
       **Who are you filing on behalf of?**
       ${users[1].name.full(middle='full')}
     show if: filing_for_whom != "me"
-  - Edit: protect_whom
-    button: |
-      **Who do you want to protect?**
-      
-      % if protect_whom['me']:
-      * Myself
-      % endif
-      % if protect_whom['minor']:
-      * A minor child
-      % endif
-      % if protect_whom['adult']:
-      * An adult who cannot file due to age, disablility or health
-      % endif
-  - Edit: user_military
-    button: |
-        **Are you a service member of the Illinois National Guard or another reserve military component serving in Illinois?**
-        % if user_military and has_military_order:
-        Yes, and I have a Military Protective Order.
-        % elif user_military:
-        Yes, but I do not have a Military Protective Order.
-        % else:
-        No
-        % endif
-    show if: protect_whom['me']
+  #- Edit: user_military
+  #  button: |
+  #      **Are you a service member of the Illinois National Guard or another reserve military component serving in Illinois?**
+  #      % if user_military and has_military_order:
+  #      Yes, and I have a Military Protective Order.
+  #      % elif user_military:
+  #      Yes, but I do not have a Military Protective Order.
+  #      % else:
+  #      No
+  #      % endif
+  #  show if: protect_whom['me']
   - Edit: other_parties[0].name.first
     button: |  
       **Perpetrator's name:**
