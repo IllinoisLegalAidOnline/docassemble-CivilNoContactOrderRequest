@@ -2688,7 +2688,6 @@ code: |
   others_with_minor_initials.clear()
   if filing_for_whom == "me":
     if others_protected.there_are_any and others_protected.number_gathered() > 0:
-      others_with_minor_initials.clear()
       for index, other in enumerate(others_protected):
         
     
@@ -2696,7 +2695,9 @@ code: |
           #I append append an object here and set its name to the "other"'s name because if I just appended the "other" editing the "others_with_minor_initial[index]"'s name would also edit the "other"'s name.
           others_with_minor_initials.appendObject(ALIndividual)
           others_with_minor_initials[index].name.first = other.name.first[:1]
+          others_with_minor_initials[index].name.first += "."
           others_with_minor_initials[index].name.last = other.name.last[:1]
+          others_with_minor_initials[index].name.last += "."
         else:
           others_with_minor_initials.append(other)
       others_with_minor_initials.there_is_another = False
@@ -2704,7 +2705,9 @@ code: |
     if filing_for_whom == "child":
       others_with_minor_initials.appendObject(ALIndividual)
       others_with_minor_initials[0].name.first = users[1].name.first[:1]
+      others_with_minor_initials[0].name.first += "."
       others_with_minor_initials[0].name.last = users[1].name.last[:1]
+      others_with_minor_initials[index].name.last += "."
     else:
       others_with_minor_initials.append(users[1])
     others_with_minor_initials.there_is_another = False
