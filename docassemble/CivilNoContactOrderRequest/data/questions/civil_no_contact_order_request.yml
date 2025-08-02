@@ -2683,6 +2683,11 @@ code: |
         event.include_in_addendum = False
   addendum_check = True
 ---
+id: initials debug
+continue button field: ugh_initials_debug
+question: |
+  Has the list disappeared from the review screen?
+---
 reconsider: True
 code: |
   others_with_minor_initials.clear()
@@ -2699,7 +2704,12 @@ code: |
           others_with_minor_initials[index].name.last = other.name.last[:1]
           others_with_minor_initials[index].name.last += "."
         else:
-          others_with_minor_initials.append(other)
+          others_with_minor_initials.appendObject(ALIndividual)
+          others_with_minor_initials[index].name.first = other.name.first
+          others_with_minor_initials[index].name.middle = other.name.middle
+          others_with_minor_initials[index].name.last = other.name.last
+          others_with_minor_initials[index].name.suffix = other.name.suffix
+          #others_with_minor_initials.append(other)
       others_with_minor_initials.there_is_another = False
   else: 
     if filing_for_whom == "child":
@@ -2707,9 +2717,14 @@ code: |
       others_with_minor_initials[0].name.first = users[1].name.first[:1]
       others_with_minor_initials[0].name.first += "."
       others_with_minor_initials[0].name.last = users[1].name.last[:1]
-      others_with_minor_initials[index].name.last += "."
+      others_with_minor_initials[0].name.last += "."
     else:
-      others_with_minor_initials.append(users[1])
+      others_with_minor_initials.appendObject(ALIndividual)
+      others_with_minor_initials[0].name.first = users[1].name.first
+      others_with_minor_initials[0].name.middle = users[1].name.middle
+      others_with_minor_initials[0].name.last = users[1].name.last
+      others_with_minor_initials[0].name.suffix = users[1].name.suffix
+      #others_with_minor_initials.append(users[1])
     others_with_minor_initials.there_is_another = False
   with_initials = True
 ---
@@ -4131,8 +4146,8 @@ review:
     button: |
       **Others to protect: (Edit to change names, addresses, and other information)**
 
-      % for my_var in others_protected:
-        * ${ my_var.name_full() }
+      % for person in others_protected:
+        * ${ person.name_full() }
       % endfor
     show if: others_protected.there_are_any
 ---
