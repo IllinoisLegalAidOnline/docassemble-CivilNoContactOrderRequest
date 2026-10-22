@@ -8,9 +8,9 @@ metadata:
 ---
 include:
   - docassemble.AssemblyLine:assembly_line.yml
-  - docassemble.ALToolbox:escape_button.yml  
   - docassemble.ILAO:ilao-interview-framework.yml
   - docassemble.ILAO:shared-basic-questions.yml
+  - docassemble.ALToolbox:escape_button.yml  
 ---
 objects:
   - users: ALPeopleList.using(there_are_any=True)
